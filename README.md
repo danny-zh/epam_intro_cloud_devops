@@ -65,4 +65,35 @@ Allows the restriction in the amount of storage space used in a partition by a u
 ### 1.4	Boot Loaders
 At computer start up, the OS system needs to be loaded from HDD or SDD storage devices. There is small program to do this, it is called the boot loader or bootstrap and it is usually store on the ROM of the device. For linux based systems we can find the GRUB boot loader.
 ### 1.4 Run Levels
-It defines the state of the computer machine after booting. In practice, run level 0 meas the machine halts and run level 6 means the machine reboots.
+It defines the state of the computer machine after booting. In practice, run level 0 means the machine halts and run level 6 means the machine reboots. 
+
+Modern distributions use systemd daemon as process and service manager. Systemctl is a command-line utility that is used to control and manage systemd system and service manager. Runlevels can be set by using systemctl command
+- To list all run levels from systemd we an do:
+  
+  `$ systemctl list-units --type=target`
+- To get the default run level we can do:
+  
+  `$ systemctl get-default`
+- To set the default run level we can do:
+  
+  `$ systemctl set-default runlevel3.target`
+
+- To change to a specific run level we can do:
+  
+  `$ systemctl isolate runlevel0.target # This command shuts down the machine`
+
+## 2. Linux Shell Basics
+
+### 2.1 Shell
+A shell is a command line interpreter that allows user to input commands that execute some tasks. This commands are translated into calls to the linux kernel so the instructions can be completed by the underlying hardware. Commands also can be read from a file and in this way is called scripting. There are various types of shells like sh (bourne shell), csh (C shell), tcsh (Tenex C shell - Turbo C shell), ksh (Korn shell) and others yet the standard for linux distros is bash (Bourne again shell) which is a superset of sh adding more flexibility and advanced features to users.
+
+The shell can be customized to display information in the shell window as preferred by the user, also can be used to execute script files when login in and login out. Common files to set behaviour of the bash shell are:
+- /etc/profile
+- ~/.bash_profile
+- ~/.bash_login or ~/.profile
+- ~/.bash_logout
+
+### 2.2 Shell programming
+Shell commands can be used to create scripts to automate certain tasks. Shell scripting is common used for repetitive operations over the linux distro like for example checking the disk space and if over 70% write a log that goes to a logging server. Despite being a powerful tool, we shouln't consider to use shell scripting to build complex applications since it doesn't support OOP or other complex data structures such as multidimensional arrays, linked lists, stacks, trees and so on. 
+
+### 2.3 Basic Shell commands
