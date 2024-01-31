@@ -97,3 +97,46 @@ The shell can be customized to display information in the shell window as prefer
 Shell commands can be used to create scripts to automate certain tasks. Shell scripting is common used for repetitive operations over the linux distro like for example checking the disk space and if over 70% write a log that goes to a logging server. Despite being a powerful tool, we shouln't consider to use shell scripting to build complex applications since it doesn't support OOP or other complex data structures such as multidimensional arrays, linked lists, stacks, trees and so on. 
 
 ### 2.3 Basic Shell commands
+- man, used to get information about commands, utilities and other programs in the system
+  
+  `$ man -k command_name #Searches for commands that contains the command_name in their name`\
+  `$ man -f command_name #Searches for commands that their name is command_name`
+- info, used to display information about commands
+
+  `$ info command #Searches for documentation of command`
+- mkdir, used to create directories
+  
+    `$ mkdir -p par_dir/child_dir{a..c}/child_dir # when used with the -p option it creates the parent directories of child directories in case they don't extist`
+
+- mv, used to move files/directories to another location
+
+  `$ mv -b -S ".old" filename dir/ # The option -b means backup, if filename already exists in the destination, the existing file will be rename with the suffix indicated by the option -S`
+- tail, to view the last 10 lines by default of a file
+ 
+     `$ tail -f # when used with the -f option it display interactiely the contents of the file, useful when checking dynamic file such as logs`
+    
+### 2.4 Text editors
+
+Text editor are used to create and edit plain text files. All linux distros support vi, vim and nano and by default comes with vi installed.
+
+### 2.5 Filesystem files search
+
+When need to search for a file or directory within a the filesystem structute we can use three different commands: find, locate and grep
+
+- find: support various options to narrow down the search to find items based on its type like a regular file or a directory. It mainly work with the path that is given to complete the search, if the path is not specified by default searches all filesystem under /
+
+  `$ find /tmp -name core -type f -exec rm {} \; # The commands searchs within the /tmp folder a file with name core and then removes it`
+
+- locate: uses local database mlocate to quickly find locations of files or directores within the filesystem, mlocated is an indexed database with file names and therefore it is much faster to lookup for them since it does not the to scan the entire filesystem but rather find the corresponding entry in the mlocate.db file. The database is updated regularly but can be done by using the command updatedb.
+
+  `$ locate -br ^shadow$ # the command searches for filenames which their base contains only the word shadow`
+
+- grep: can be used to search for specific matches of contents in plain files using regular expressions. For instance maybe you want to find a file that you remember it had a definiton of a function called myfunc(). Since grep is to find patterns in files you need to specified the file to read from, if not specified it will read from STDIN
+
+`$ grep -r myfun . # With the option -r searches recursively the pattern myfun inside the plain files living under the specified path. The dot means to search in the current directory`
+
+### 2.6 Xargs
+
+
+
+  
