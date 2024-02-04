@@ -137,6 +137,88 @@ When need to search for a file or directory within a the filesystem structute we
 
 ### 2.6 Xargs
 
+Command that reads arguments from SDTIN and executes the specified command for each of given arguments. If no command is given form xargs then the default command it uses is /bin/echo
+
+We see a couple a couple of examples here:
+
+- Command to find all *.png files and compress them
+
+  `$ find . -name *.png -type f | xargs tar -cvzf images.tgz`
+- Command to list in a single line all users in your linux distro:
+  
+  `$ cut -d ":" -f 1 /etc/passwd | xargs`
+
+- Command to create files with arguments as filenames
+
+  `$ cat name | xargs touch`
+
+- Command to see the number of lines, words and bytes files have
+
+  `$ ls -p  | grep -v / | xargs wc`
+
+- Command to recursively delete folder that contain certain name
+
+  `find /Downloads -name downterm -type d print0 | xargs -0 rm -vrf "{}" # print0 print output with null character as spacing instead of withespace, the -0 option of xargs command indicates the arguments are expected to be separated by the null character, the {} means the arguments from SDTIN`
+
+- Command to copy executable files from one location to another
+
+  `$ find -name *.sh -type f print0 | xargs -0 -i cp {} target_folder`
+
+ ### 2.7 Working with archives
+
+In linux there are various utilities for achiving and compressing files. Archiving means putting togheter various files into a single one, think of it as putting various objects into a single box. By the other hand compressing means reducing the size in disk of an object. There various compressing algorithms that can be used, one important thing to consider is whether the algorithm is lossy or lossless. Lossy algorithms can be use for instance for compressing data types that permit certain loss of their information such an image, audio or video whereas lossless compressing must be used for data that cannot admit any loss and their integrity must remain unchanged such as binary files, text files and scripts.
+
+Tools we can use for both purposes of archiving and compresing are tar, zip and gzip. GZIP can achieve higher compression ratios that ZIP because it uses DEFLATE compression algotithm, however gzip can be applied to singe files or directories only. Whereas ZIP can combine various files and directories into one single compressed and archived file. Commonly command tar with compression option -z that means bzip is used.
+
+- Archiving various files and compressing with bzip the resulting object
+
+  `$ tar -cvzf images.tgz *.png #The -c option means create archive, -v means verbose output, -z means compress by using lossless bzip algorithm, -f specifies the name of the resulting file and finally the oputput is`
+
+- List archived files in archive
+
+  `$ tar -tf image.tgz`
+
+- Decompressing and unarchiving files from compressed archived file object
+
+    `$ tar -xvzg images.tgz # -x option means extract`
+
+## 3. Package Management
+### 3.1 Sofware Management
+In Linux there is a wide range of utilities, services and other tools available in the form of software package. A software package is binary archive that is available for download and installation on the local linux system. Such archived software files can be managed by a software management system comprised of a set of tools that can automate the installation, updating, upgrading, purging and removal of such software packages. Each distribution family can have their own software package management system, for example in Readhat derived distros we can find RPM and YUM managers whereas in Debian derived distros we can use DPKG and APT. Both RPM and DPKG are considered to be low level package management tools to manage individual software packages, also they they cannot resolve dependencies (if needed) by a package, this means that you must install manually all dependencies before hand required by a particular software package. YUM and APT on the other part, manage dependency resolution automatically and make all dependencies installations for you, underneath they also use RPM and DPKG as their backend for individual package management.
+
+### 3.2 Alternatives
+
+The alternatives command in Linux is used to manage symbolic links for different versions of a program or service. It allows you to switch between different implementations of a particular command or service without manually updating the symbolic links. Normally alternatives command can be used for:
+
+- Switching between different versions of a program such as for example switching between python 2 and python3 version
+- Setting default programs such as the default text or mail client
+- Setting system-wide configuration parameters such as default python version
+
+### 3.3 Systemd/init.d
+
+In legacy system-v based linux systems the scripts for managing system services can be found in the /etc/init.d folder. To manage a particular system service we can  run `$ /etc/init.d/service_name command` where service_name is the service to be managed and command can be one of the following:
+- Start
+- Stop
+- Restart
+- Reload
+- Force-reload
+  
+In newer linux systems the process and service manager is called systemd. This modern system initialization and process and service manager tool can offer faster boot times compared to system-v by starting system services in parallel. Systemd uses unit files located in /etc/systemd/system that describes the commands, resources and dependencies for managing the execution of the system services. Unit files follows a declarative structure comprised of three main parts
+
+1. [unit]: Contains generic (metadata) information about the service
+2. [service]: Which encodes information about the service itself. It contains all those settings that apply only to services, the start, stop, reload script
+3. [Install]: It encodes information about how the suggested installation should look like, for instance, under which circumstances and by which triggers the service shall be started.
+
+For intereacting with a service we can run:
+
+- Status, start, stop, restart, reload service
+
+  `$ systemctl status|start|stop|restart|reload sshd.service`
+
+Systemd also uses its own logging daemon called journal that collects logs from various sources and stores them in form of binary files, this way allows effient search and filtering. To interact with the binary log files from journal we can used journalctl. For example to look for the status of a particular service we can run:
+
+  `$ journalctl  -p err -b -xu sshd # -p means show only err (5) messages and above, -b means since last boot, -x means explanatory log ouput, -u means from which unit we want to see the log message`
+
 
 
   
