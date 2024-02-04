@@ -256,5 +256,84 @@ Some examples of scheduled jobs using crontab systax are:
 - Execute multiple task each 20 seconds
 
    `* * * * * /bin/sleep 20 && /path_to/script1.sh;/path_to/script2.sh;/path_to/script3.sh
+## 4. Users, groups, permissions
+### 4.1 Users and Groups
 
+Users information in linux is stored in **/etc/password** file. This file contains login and non-login users. Non login users mean they are not intended to login into the system, these users are intended to control running background services, daemons, or system processess. For instace the postgresql user is used to manage execution of postgresql application. The sctructure of a entry in the **/etc/password** file is as shown in the figure 3. Each entry denotes a user.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/c62ed4d2-85d6-4547-9b85-13f8452107e4"
+         alt="Figure 2" width="600" height="200"/>
+  <br/>
+  <em>Figure 3. User information structure in /etc/password</em>
+</p>
+
+Groups infomation in linux is stored in **/etc/group** file. Each entry in this file represents a group. The structure of a entry in the **/etc/group** file is as shown in the figure 4.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/d06155e0-fe10-431b-991d-9f786151ccca"
+         alt="Figure 2" width="600" height="200"/>
+  <br/>
+  <em>Figure 4. Group information structure in /etc/group</em>
+</p>
+
+Commands for users:
+- `$ su -l username` Switch between users. If not user is given by default tries to swicth to the root user.
+- `$ sudo -u username command` Run commands with the security privilege of another user. If username if not given the instruction will be run as root.
+- `$ useradd -d /home/username -s /bin/bash username` Adds username with home directory and shell specified by the options -d and -s respectively.
+- `$ userdel -r username` Deletes username and its home directory.
+- `$ usermod -d /home/new username` Modifies username's home directory
+- `$ finger username` Displays information about an user
+
+Commands for groups:
+-`$ groupadd groupname` Adds group
+-`$ groupdel groupname` Deletes group
+-`$ groupmod -n newgroup groupname` Modfies group's name from groupname to newgroup
+
+### 4.2 Permission Model
+
+Each object under linux file system is accessible by its permission set. This permision set adds a security layer for access control, this limits what users and groups are allowed to access, write or execute the contents of the object. The figure 5 shows the permission model for linux objects
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/146394ed-d265-4b3b-8224-b5d7c78d1215"
+         alt="Figure 2" width="600" height="200"/>
+  <br/>
+  <em>Figure 5. Permission Model</em>
+</p>
+
+Commands to change permission on objects
+
+- `$ chmod go-rw file.txt` Remove read and write permissions from group and others
+- `$ chown new_user:new_gruop file.txt` Change the user and group owner of file.txt to new_user and new_group respectively.
+- `$ chgrp new_group file.txt` Changes only the owner group of the file
+
+When working in a shared folder by multiple users who has access rwx permissions in the folder's **group/others permission set**, the contents created by an individual user may be edited or deleted by another user. To prevent this situation there is something called the sticky bit, this is an extra permission value that can be added to a shared folder in the **others** permission set, this means that files created by individual users cannot be changed or deleted by other users. The sticky bit can be recognized in a shared folder when the **others** permission set contains a t or T. If T is displayed it means the others permission set is missing the execute permission (x), meaning that users that don't belong to the shared_folder group cannot enter the directory.
+
+- `$ chmod +t shared_folder` or `$ chmod o+t shared_folder` Adds the stickly bit for the shared folder in symbolic notation
+- `$ chmod -t shared_folder` or `$ chmod o-t shared_folder` Removes the stickly bit for the shared folder in symbolic notation
+- `$ chmod 1755 shared_folder` Adds the stickly bit for the shared folder in octal notation
+- `$ chmod 0755 shared_folder` Removes the stickly bit for the shared folder in octal notation
+
+There are other two extra permissions called **Set User ID (SUID)** and **Set Group ID (SGID)**, these permissions allows effectively for a command or script to be run by another user on behalf of the user who owns the command/script. For this permission to be effective the x permission also needs to be set on the file.
+
+- `$ chmod u+xs file.sh` or `$ chmod 4755 file.sh` Adds the SUID bit for file.sh meaning any user can run this command on behalf of user owner
+- `$ chmod g+xs file.sh` or `$ chmod 2755 file.sh` Adds the GUID bit for file.sh meaning any user can run this command on behalf of group owner 
+
+Finally, for files and directories there is a extended permission set that is called special attributes. These attributes can be set by chattr and lsiter by lsattr
+
+- `$ lsattr filename/directory` Shows the special attributes set on the specified file or directory.
+- `$ chattr +i filename` Sets the special attribute flag i which means inmutable, file cannot be change or deleted, not even by root
+- `$ chattr +a filename` Sets the special attribute flag a which means content can only be added to file, previous content cannot be deleted, not even by root
+- `$ chattr +s filename` Sets the special attribute flag s which means when secure deletion, the storage block occupied by the file on disk will be filled with zeros
+
+### 4.3 SELinux
+
+Security Enhanced Linux is an advanced access control mechanism built into most of morden linux distros. SELinux implements what is kwnon as Mandatory Access Control (MAC). SELinux has 3 working modes:
+
+1. Enforcing: SELinux enforces its policy blocking any unauthorized access attempts by users and processes. The access denials are reported to relevant log files.
+2. Permissive: Doest not enforces its policy and therefore no access is denied but any violation attempts are reported to relevant log files.
+3. Disable: Does not enforces its policy and does not report any violation attempt.
+
+To check the current status of SELinux we can use `$ getenforce` or `$ sestatus` commands and the main configuration file is located under **/etc/selinux/config**
   
+
