@@ -5,7 +5,12 @@
 ### 1.1	Logical Volume Managent – LVM
 Refers to the technology that allows to create units of virtual disks, mostly supported on linux
 
-![image](https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/ad89ed63-3f13-4c0c-86db-776ca194eaa7)
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/ad89ed63-3f13-4c0c-86db-776ca194eaa7"
+         alt="Figure 1" width="600" height="300"/>
+  <br/>
+  <em>Figure 1. LVM Architecture</em>
+</p>
 
 To create a LVM you need yo perform the following tasks:
 - Initialize partitions you will use for LVM
@@ -184,7 +189,7 @@ Tools we can use for both purposes of archiving and compresing are tar, zip and 
 
 ## 3. Package Management
 ### 3.1 Sofware Management
-In Linux there is a wide range of utilities, services and other tools available in the form of software package. A software package is binary archive that is available for download and installation on the local linux system. Such archived software files can be managed by a software management system comprised of a set of tools that can automate the installation, updating, upgrading, purging and removal of such software packages. Each distribution family can have their own software package management system, for example in Readhat derived distros we can find RPM and YUM managers whereas in Debian derived distros we can use DPKG and APT. Both RPM and DPKG are considered to be low level package management tools to manage individual software packages, also they they cannot resolve dependencies (if needed) by a package, this means that you must install manually all dependencies before hand required by a particular software package. YUM and APT on the other part, manage dependency resolution automatically and make all dependencies installations for you, underneath they also use RPM and DPKG as their backend for individual package management.
+In Linux there is a wide range of utilities, services and other tools available in the form of software package. A software package is binary archive that is available for download and installation on the local linux system. Such archived software files can be managed by a software management system comprised of a set of tools that can automate the installation, updating, upgrading, purging and removal of such software packages. Each distribution family can have their own software package management system, for example in Readhat derived distros we can find RPM and YUM managers whereas in Debian derived distros we can use PKG and APT. Both RPM and PKG are considered to be low level package management tools to manage individual software packages, also they they cannot resolve dependencies (if needed) by a package, this means that you must install manually all dependencies before hand required by a particular software package. YUM and APT on the other part, manage dependency resolution automatically and make all dependencies installations for you, underneath they also use RPM and PKG as their backend for individual package management.
 
 ### 3.2 Alternatives
 
@@ -203,7 +208,8 @@ In legacy system-v based linux systems the scripts for managing system services 
 - Reload
 - Force-reload
   
-In newer linux systems the process and service manager is called systemd. This modern system initialization and process and service manager tool can offer faster boot times compared to system-v by starting system services in parallel. Systemd uses unit files located in /etc/systemd/system that describes the commands, resources and dependencies for managing the execution of the system services. Unit files follows a declarative structure comprised of three main parts
+In newer linux systems the process and service manager is called systemd. This modern system initialization and process and service manager tool can offer faster boot times compared to system-v by starting system services in parallel. Systemd uses unit files located in **/usr/lib/systemd/system** (units created by installation packages), **/run/systemd/system** (units created at runtime) and **/etc/systemd/system** (system-wide units and custom units
+created by user) that describes the metadata, resources, commands,  and dependencies for managing the execution of the system services. Unit files follows a declarative structure comprised of three main parts
 
 1. [unit]: Contains generic (metadata) information about the service
 2. [service]: Which encodes information about the service itself. It contains all those settings that apply only to services, the start, stop, reload script
@@ -219,6 +225,36 @@ Systemd also uses its own logging daemon called journal that collects logs from 
 
   `$ journalctl  -p err -b -xu sshd # -p means show only err (5) messages and above, -b means since last boot, -x means explanatory log ouput, -u means from which unit we want to see the log message`
 
+### 3.3 Crond
 
+Crond is a daemon that comes with all linux distros and it's useful for scheduled command execution. Crond searches for system-wide crontab files located in **/etc/crontab**, **/etc/anacrontab*** and **/etc/cron.d** and also searches for user defined crontabs files usually located at **/var/spool/cron** . To add/edit an user defined scheduled job you can use `$ crontab -e` this will open crontab file of the user in **var/spool/cron** folder. It is recommended to use crontab command instead of editing the files directly. 
+
+The structure of an scheduled job in a crontab file is as shown in figure 2, the basic entry syntax is **"\* * * * * /path_to/{command|script
+}"**. Dependending on the needs the scheduled jobs can be set to be executed on certaing basis either in terms of minutes, hours, days, months, weekdays or a whole combination of each item. The output of a crontab scheduled job is by default sent to the local mailbox in **/var/spool/mail/username** of the user that created the entry in the crontab file. If the output needs to be displayed or stored somewhere else then STDOUT redirection must be specied in the crontab entry.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/656bd95a-f333-4d7e-aa1a-7a890623ddd7"
+         alt="Figure 2" width="600" height="200"/>
+  <br/>
+  <em>Figure 2. Crontab entry syntax</em>
+</p>
+
+Some examples of scheduled jobs using crontab systax are:
+
+- Execute echo command every 3 minutes and redirect its STDOUT and SDTERR to file
+
+  `*/3 * * * * /bin/echo "Executed commmand" 2>&1 outputfile.log`
+  
+- Execute echo command at 05:00 PM from monday to friday during the month of March
+
+  `0 17 3 * 1-5 /bin/echo "Executed commmand"`
+
+- Execute echo command twice a day at 5 AM and 5 PM on the first sunday of every month
+
+   `0 5,17 * * sun [ $(date +%d) -le 7 ] && /bin/echo "Executed command`
+
+- Execute multiple task each 20 seconds
+
+   `* * * * * /bin/sleep 20 && /path_to/script1.sh;/path_to/script2.sh;/path_to/script3.sh
 
   
