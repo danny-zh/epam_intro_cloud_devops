@@ -328,12 +328,114 @@ Finally, for files and directories there is a extended permission set that is ca
 
 ### 4.3 SELinux
 
-Security Enhanced Linux is an advanced access control mechanism built into most of morden linux distros. SELinux implements what is kwnon as Mandatory Access Control (MAC). SELinux has 3 working modes:
+Security Enhanced Linux is an advanced access control mechanism built into most of morden linux distros. SELinux implements a fined-grained access control referred to as Mandatory Access Control (MAC), it uses policies under **/etc/selinux** that describe configurations and rules to control how users and processes interact with system resources such as files, directories, networks, ports and devices by restricting their permissions and actions over each resource.
 
-1. Enforcing: SELinux enforces its policy blocking any unauthorized access attempts by users and processes. The access denials are reported to relevant log files.
+SELinux has 3 working modes:
+
+1. Enforcing: SELinux enforces its policy blocking any unauthorized access attempts by users and processes. The access denials are blocked and reported to relevant log files.
 2. Permissive: Doest not enforces its policy and therefore no access is denied but any violation attempts are reported to relevant log files.
 3. Disable: Does not enforces its policy and does not report any violation attempt.
 
-To check the current status of SELinux we can use `$ getenforce` or `$ sestatus` commands and the main configuration file is located under **/etc/selinux/config**
-  
+To check the current status of SELinux we can use `$ getenforce` or `$ sestatus` commands
+
+## 5. Networking, Remote Access
+
+### 5.1 Network configuration
+
+Networking configuration can be performed to be temporary or permament. Temporary configuration means changes are loaded in RAM during the current session, once the system shutdowns or reboots the configuration is lost. On the other hand permanent configuration means changes are stored in system files from which information is read in each boot. 
+
+Temporary networking configuration can be achieve by using the `$ ip ` command. Some examples are:
+
+- `$ ip address` Displays current interface address configuration
+- `$ ip link show` Displays available interface cards and their statuses
+- `$ ip link set enp0s8 down` Turning down an interface card
+- `$ ip address add 192.16.15.1/24 dev enp0s8` Adds an static ip address to interface enp0s8
+- `$ ip route add 172.16.20.0/24 via 192.16.15.2 dev enp0s8` Adds an static route for net 172.16.20.0/4 whose next hop is 192.16.15.2 and the outbound interface is enp0s8
+
+Permanent networking configuration must be done in system files. For centos these configuration files are interface specific scripts and can be found in **/etc/sysconfig/network-scritps/ifcfg-interface_name**. Each configuration script contains a set of directives in the form of key value pairs that describe the networking configuration of that particular interface. The following are some directives that can be configured:
+
+- `BOOTPROTO=none|dhcp` Specifies whether the interface must request a dhcp address or uses local configuration contained in the script
+- `IPADDR=192.168.15.1` Sets static IPV4 network address
+- `NETMASK=255.255.255.0` Sets static IPV4 network mask
+- `BROADCAST=192.168.15.255` Specifies the broadcast address to which the interface belongs
+- `GATEWAY=192.168.15.100` Specifies the default gateway or router for the net to which the interface belongs
+- `DNS=8.8.8.8` Specifies the default DNS used by the interface for domain resolution
+
+### 5.2 Networking tools
+
+Linux has various utilities for network related operations such as connectivity testing, packets collection and domain name resolution. The following are some of them:
+
+- `$ ping -c 5 google.com` checks whether host is reachable
+- `$ tracepath google.com` display the path the packages take to reach the destination (may not be the same every time)
+- `$ host google.com` and `host 8.8.8.8` Translates domain names to ip addresses and viceversa, simple tool
+- `$ dig google.com` and `dig 8.8.8.8` Translates domain names to ip addresses and viceversa, advanced tool for troubleshooting DNS and performing advanced queries
+- `$ nslookup google.com` and `nslookup 8.8.8.8` Translates domain names to ip addresses and viceversa, being replaced by dig
+- `$ tcpdump -i enps08` shows traffic being handled by interface enp0s8
+- `$ ss -tlnp` shows system listening connections on tcp ports
+
+### 5.3 Firewal.d and Iptables
+
+Centos has default built-in stateful Firewald daemon installed. Firewald is a service that provides a dynamically managed firewall that allows for implementing network security. It allows the isolation of system networks resources on different zones. Each zone has a security level of trust which is more or less permissive with the network traffic going through according to the the zone definition. The zones to which a network resource can belong to in a system running firewalld are:
+
+- Drop: Drops all incomming traffic and does not reply with any icmp message. Outgoing connections are possible
+- Block: Similar to drop but replies with impv4-host-prohibited or icmpv6-adm-prohibited message after dropping incomming connections
+- Public: Untrusted network, you can allow through certain traffic on a case-by-case basis.
+- External: If you are using the firewall as a gateway but want to expose some internal resources, you set destination NAT for certain private resources to be reachable by public networks. Private resources remain private and firewall perform destination nat.
+- Internal: If you are using the firewall as a gateway and want to access the internet, you set source NAT for address translation from private to public
+- Dmz: Computer services that can be accesed by external networks, servers/computers located in this zone will not have access to internal network, only specified connections can be allowed.
+- Work/home/trusted: Trusted networks
+
+Firewalld keeps close relation with iptables command, as most of the configurations made by high level tools like firewall-cmd or firewall-config translates the rules into iptables commands. Figure 6 illustrates the architecture of firewalld, it can be seen that this service uses iptables command for implementing the security rules into the linux kernel.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/6769e0d9-fc30-434d-870c-cd9d7439c8ab"
+         alt="Figure 6" width="600" height="200"/>
+  <br/>
+  <em>Figure 6. Firewald and iptables service</em>
+</p>
+
+One key difference between firewalld and iptables service (not command) is that with the later adding or modifying any rule means flushings all current rules and recreating new ones from the files **/etc/sysconfig/itpables** and **/etc/sysconfig/ip6tables**, this causes active connections to be dropped. Firewalld by the contrary does not recreate all rules, instead only the difference of old configuration and new configuration is applied and therefore no connections are lost
+
+Some commands to interact with firewalld:
+
+- `$ firewall-cmd --get-services | xargs -n 1` Get all services listed line by line
+- `$ firewall-cmd --info-service=ftp` Get information of an specific service
+- `$ firewall-cmd --panic-on|off` Dropping all packets
+
+  ### 5.4 Remote Access
+
+Remote access is typically intented for performing administrative tasks on a remote machine. There are various protocols and GUI programs that can help in the establishment of remote connections. Some of them are:
+
+1. Protocols
+  - Telnet (insecure, not to be used over public networks)
+  - SSH (Recommended, it uses encryption)
+2. GUI programs
+  - winSCP
+  - Putty
+  - X11 (Protocol to forward GUI of a remote machine)
+  - VNC/Anydesk
+
+Most of the time you will be using SSH utility to connect ot a remote host by using command line. The usage of SSH is as follows:
+
+- `$ ssh-keygen -t rsa -c 4096` Generates ssh public-private key pair using RSA algorithm, the lenght of the key is set to be 4096 bits
+- `$ ssh-copy-id remote@domain.com` Copies the pub key of current user to remote server, this allows for passwordless auth, when copied you can edit /etc/ssh/sshd_config file and set passwordauthentication to no
+- `$ ssh -i ~/.ssh/id_rsa remote@domain.com` Logins to remote machine using private key file indicated by -i option
+- `$ ssh remote@domain.com whoami&&pwd` Logins and executes the specified commands in the remote machine, then brings the output and terminates the session
+- `$ ssh -t remote@domain.com sudo ls /root` if command in the remote machine needs users input a pseudo terminal must be added to provide the required action. For this purpose use -t option
+- `$ ssh remote@domain.com < script.sh` Execution of local script in remote machine
+
+When accesing various machines recurrently, you can edit the **~/.ssh/config** file for establishing alias for ssh connections, for example you can use `$ ssh remote_prod_server1` instead of using the full username and domain address. The following is an example:
+
+`host remote_prod_server1
+    user remote_user
+    hostname domain.com
+    identityfile ~.ssh/id_rsa
+    port 2222`
+
+Lastly, a very useful concept is about bastion host. This scenario is when you use an intermediary computer/server to login to another computer/server. Think of it as a "cascade login". For example, user in host A logins to host B and then from host B logins to host C. The command to achieve such behaviour with SSH is a proxy command. 
+
+- `$ ssh -i key_for_hostB -o "ProxyCommand ssh -W %h:%p -i key_for_hostC host_c@hostc_domain.com" hostb@hostb_domain.com` The -o option in the ssh command means that a proxycommand option will be used.
+
+
+
 
