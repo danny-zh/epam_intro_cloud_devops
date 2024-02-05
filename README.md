@@ -426,11 +426,13 @@ Most of the time you will be using SSH utility to connect ot a remote host by us
 
 When accesing various machines recurrently, you can edit the **~/.ssh/config** file for establishing alias for ssh connections, for example you can use `$ ssh remote_prod_server1` instead of using the full username and domain address. The following is an example:
 
-`host remote_prod_server1
+```
+host remote_prod_server1
     user remote_user
     hostname domain.com
     identityfile ~.ssh/id_rsa
-    port 2222`
+    port 2222
+```
 
 Lastly, a very useful concept is about bastion host. This scenario is when you use an intermediary computer/server to login to another computer/server. Think of it as a "cascade login". For example, user in host A logins to host B and then from host B logins to host C. The command to achieve such behaviour with SSH is a proxy command. 
 
