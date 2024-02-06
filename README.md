@@ -438,6 +438,51 @@ Lastly, a very useful concept is about bastion host. This scenario is when you u
 
 - `$ ssh -i key_for_hostB -o "ProxyCommand ssh -W %h:%p -i key_for_hostC host_c@hostc_domain.com" hostb@hostb_domain.com` The -o option in the ssh command means that a proxycommand option will be used.
 
+## 6. Monitoring, Process Control, Logs
+
+### 6.1 Process Monitoring
+
+Processes are running programs or services that uses system resources such as processor, disk, network and RAM . To manage processes there are various utilities on linux that are: Top, ps, kill and killall.
+
+1. Top: Dynamically shows proccesses information running on the system, the displayed information includes the number of tasks running, sleeping, stop and zombie, the PID (Process ID) of each task, the user that initiated the task, the duration in time since the process was started on the system, the command that initiated the process and so on. The top command also allows for interaction to organize process by %CPU and %MEM (RAM) consumption and displays the average load of the system in last 1, 5 and 15 minutes. CPU and RAM usage.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/c00fe8ec-67cc-4196-bbac-61010f1b35f6"
+         alt="Figure 7" width="600" height="200"/>
+  <br/>
+  <em>Figure 7. Example of Top command output</em>
+</p>
+
+2. Ps: Shows an snapshot of processes/services running in the system. It is a static version of TOP
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/0bfb526a-4e87-4227-b50a-805ce7cc3c8f)"
+         alt="Figure 8" width="600" height="200"/>
+  <br/>
+  <em>Figure 8. Example of ps aux command output</em>
+</p>
+
+3. Kill/pkill: Allows to terminate a process or process group by sending a termination signal to it. Processes can be killed by using its process id or command name that initiated the process. If no signal is specified then the default signal sent is SIGTERM which allows the process to exit gracefully and to perform some clean up operations or shutdown process if needed. Another common signal for killing processes is SIGKILL, this signal terminates the process inmediatly, the general recommendation is to use SIGTERM and use SIGKILL as a last resort.
+
+Some usefull commands are:
+
+- `$ kill -l` Lists all available termination signals. Processes may react differently to a given termination signal, for instace the signal SIGHUP is normally used for daemons to reload configuration files.
+- `$ kill 156` kills with SIGTERM signal the process id 156
+- `$ pkill -9 ping` kills with SIGKILL signal all the processes of name ping
+   
+### 6.2 Monitoring CPU
+
+For interacting with the Central Processing Unit we can use several commands to show information, CPU load and CPU statistics.
+
+- `$ lscpu` This commands shows architecure of the CPU such as the architecture (generally _X86 in servers), number of cores, sockets, threads per core
+- `$ mpstat -P number` Displays CPU statistics of single core processor indicated by number which can vary from 0 (means 1st core) to n if the CPU has more than 1 core.
+- `$ mpstat -P ALL` Displays CPU statistics of all core processors.
+
+### 6.2 Monitoring Memory
+
+
+
+
 
 
 
