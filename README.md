@@ -132,7 +132,7 @@ When need to search for a file or directory within a the filesystem structute we
 
   `$ find /tmp -name core -type f -exec rm {} \; # The commands searchs within the /tmp folder a file with name core and then removes it`
 
-- locate: uses local database mlocate to quickly find locations of files or directores within the filesystem, mlocated is an indexed database with file names and therefore it is much faster to lookup for them since it does not the to scan the entire filesystem but rather find the corresponding entry in the mlocate.db file. The database is updated regularly but can be done by using the command updatedb.
+- locate: uses local database mlocate to quickly find locations of files or directores within the filesystem, mlocated is an indexed database located at /var/lib/mlocate with file names and therefore it is much faster to lookup for them since it does not the to scan the entire filesystem but rather find the corresponding entry in the mlocate.db file. The database is updated regularly but can be done by using the command updatedb.
 
   `$ locate -br ^shadow$ # the command searches for filenames which their base contains only the word shadow`
 
@@ -480,6 +480,27 @@ For interacting with the Central Processing Unit we can use several commands to 
 
 ### 6.2 Monitoring Memory
 
+To check the current RAM installed on the system we can run the following commands:
+
+- `$ free -h` Displays memory information such as total, used, buffer/cache and available RAM. Also it shows information about SWAP disk/file available and used space
+- `$ vmstat` Displays information about the virtual system memory including memory information, cpu utilization, swap usage, and input/output operations related to block devices such a disk
+- `$ vmstat f` Displays the number of processes created since the last boot of the system. Including foreground and background processes.
+
+### 6.3 Monitoring Storage
+
+To check the current storage usage on system we can run the following commands:
+
+- `$ df -hT` Display the current storage space in all exsisting partitions. Option -T display installed filesystem in partition
+- `$du -sh path` Shows the current space occupied by path in partition
+- `$ lsof` Displays the information of current system files opened by daemons, users or processes.
+- `$ lsof -c sshd` Display all the system files opened by command sshd
+- `$ iostat -c 4` Monitors and displays system input/output device load information from devices and partitions, the -c option specifies how often to update the output
+
+### 6.4 Logs
+
+Logs are normaly binary files that record information about system activities and events. Logs are located in /var/log and store detailed information about proccesses, errors, warnings and other important information that is very useful for system troubleshooting and monitoring. In modern linux distros the logging is performed by the subsystem systemd-journald. The journald is a centralized subsystem that records and mantains structured and indexed binary files for loggin data, the information usually comes from different sources like the kernel, daemons, services, processes, applications and so on. The utility to navigate and search through these binary log files is journalctl
+
+- `$ journaltcl -t docker -p err -b -x` The command displays all error messages (-p) adding explanatory ouput (-x) since the last boot (-b) cointaning the tag or syslog identifir docker (-t)
 
 
 
