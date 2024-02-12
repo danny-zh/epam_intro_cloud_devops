@@ -21,10 +21,16 @@ To create a LVM you need yo perform the following tasks:
   `$ sudo vgcreate vg_newlvm /dev/sbd1 #Create logical group from sbd1 pv`
 - Create logical volume
   
-  `$ sudo lvcreate –name centos7_newvol -l 100%FREE vg_newlvm #Creates a logical volume called centos7_newvol that uses all of the unallocated free space in the volume group vg_newlvm`
+  `$ sudo lvcreate –n centos7_newvol -l 100%FREE vg_newlvm #Creates a logical volume called centos7_newvol that uses all of the unallocated free space in the volume group vg_newlvm`
 - Create a filesystem for the logical volume
   
   `$ sudo mkfs.ext4 /dev/vg_newlvm/centos7_newvol # Formats logical volume called centos6_newvol into ext4 filesystem`
+
+- Mount LVM to somewhere for instance in /mnt/data (the directory must exist)
+  `$ mount /dev/vg_newlvm/cento7_newvol /mnt/data`
+
+- To make the mounting point permanently of the lv we need to add the entry to the fstab file. This file manages how devices, partitions and other devices are mounted into the system
+  `$ /dev/vg_newlvm/cento7_newvol /mnt/data ext4 defaults 0 2`
 
 ### 1.2 SWAP 
 When computer is out of RAM and needs to complete memory request allocation, it transfers inactive cold pages from the RAM to the SWAP space. SWAP space is recommended to be a partition but also can be used as SWAP files.
