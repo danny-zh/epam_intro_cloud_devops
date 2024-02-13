@@ -197,6 +197,44 @@ Tools we can use for both purposes of archiving and compresing are tar, zip and 
 ### 3.1 Sofware Management
 In Linux there is a wide range of utilities, services and other tools available in the form of software package. A software package is binary archive that is available for download and installation on the local linux system. Such archived software files can be managed by a software management system comprised of a set of tools that can automate the installation, updating, upgrading, purging and removal of such software packages. Each distribution family can have their own software package management system, for example in Readhat derived distros we can find RPM and YUM managers whereas in Debian derived distros we can use PKG and APT. Both RPM and PKG are considered to be low level package management tools to manage individual software packages, also they they cannot resolve dependencies (if needed) by a package, this means that you must install manually all dependencies before hand required by a particular software package. YUM and APT on the other part, manage dependency resolution automatically and make all dependencies installations for you, underneath they also use RPM and PKG as their backend for individual package management.
 
+Repository management:
+
+In centos, all repositories are located in /etc/yum.repos.d/ as configuration files
+
+- `$ sudo yum repolist` Lists enabled repositories in your system
+- `$ sudo yum repolist all` Lists enabled and disabled repositories in your system
+- `$ sudo yum-config-manager --enable/--disable <repo_name>` Enables/Disables repository
+- `$ sudo yum-config-manager --add-repo <repo_url>` adds repository
+- `$ sudo yum --disablerepo="*" --enablerepo="ksplice-uptrack"` List available packages under repo ksplice-uptrack
+
+You can also create a customized repo under /etc/yum.repos.d/ by doing the following:
+
+- `$sudo vi /etc/yum.repos.d/myrepo.repo` Creates a repository configuration file named myrepo.repo
+- Edit repo configuration file
+  ```
+  [repository_name]
+  name=Repository Name
+  baseurl=http://example.com/repo
+  enabled=1
+  gpgcheck=1
+  gpgkey=http://example.com/RPM-GPG-KEY-repo```
+- `$ sudo yum makecache` Update the yum cache to make the new repository available
+  
+Package management:
+
+- `$ yum list installed <package>` List installed package version, if package is not given lists all packages installed on system
+- `$ yum search <package>`Search package in enabled system repositories
+- `$ yum provides <command|file>` Search what package provides the command or file
+- `$ sudo yum autoremove <package>` Removes a package and all its unused dependencies
+- `$ sudo yum check-updates` Check if packages have new version available
+- `$ sudo yum update <package>` Updates specified package, if not given then updates all packages with new version available
+- sudo yum remove --purge <package_name> Removes a package and its installed files
+- `$ rpm -qa | egrep <regex>` Lists all installed packages and filter by regex
+- `$ rpm -qf $(which command)` Check what package the specified command belongs to
+- `$ rpm -ql <package>)` Check what files were installed by package
+- `$ rpm -q --requires <package>` Lists dependencies needed by package
+  
+
 ### 3.2 Alternatives
 
 The alternatives command in Linux is used to manage symbolic links for different versions of a program or service. It allows you to switch between different implementations of a particular command or service without manually updating the symbolic links. Normally alternatives command can be used for:
