@@ -206,6 +206,10 @@ In centos, all repositories are located in /etc/yum.repos.d/ as configuration fi
 - `$ sudo yum-config-manager --enable/--disable <repo_name>` Enables/Disables repository
 - `$ sudo yum-config-manager --add-repo <repo_url>` adds repository
 - `$ sudo yum --disablerepo="*" --enablerepo="ksplice-uptrack"` List available packages under repo ksplice-uptrack
+- `$ sudo yum history` Displays the history of transactions made with yum
+- `$ sudo yum history info <transaction_id>` Displays information about a particular transaction made with yum
+- `$ sudo yum history undo <transaction_id>` Undoes transaction made with yum
+- `$ sudo yum history redo <transaction_id>` Redoes transaction made with yum
 
 You can also create a customized repo under /etc/yum.repos.d/ by doing the following:
 
