@@ -396,7 +396,7 @@ To check the current status of SELinux we can use `$ getenforce` or `$ sestatus`
 
 ### 5.1 Network configuration
 
-Networking configuration can be performed to be temporary or permament. Temporary configuration means changes are loaded in RAM during the current session, once the system shutdowns or reboots the configuration is lost. On the other hand permanent configuration means changes are stored in system files from which information is read in each boot. 
+Interace networking configuration can be performed to be temporary or permament. Temporary configuration means changes are loaded in RAM during the current session, once the system shutdowns or reboots the configuration is lost. On the other hand permanent configuration means changes are stored in system files from which information is read in each boot. 
 
 Temporary networking configuration can be achieve by using the `$ ip ` command. Some examples are:
 
@@ -404,9 +404,9 @@ Temporary networking configuration can be achieve by using the `$ ip ` command. 
 - `$ ip link show` Displays available interface cards and their statuses
 - `$ ip link set enp0s8 down` Turning down an interface card
 - `$ ip address add 192.16.15.1/24 dev enp0s8` Adds an static ip address to interface enp0s8
-- `$ ip route add 172.16.20.0/24 via 192.16.15.2 dev enp0s8` Adds an static route for net 172.16.20.0/4 whose next hop is 192.16.15.2 and the outbound interface is enp0s8
+- `$ ip route add 172.16.20.0/24 via 192.16.15.2 dev enp0s8 permanent` Adds a permanent static route for net 172.16.20.0/4 whose next hop is 192.16.15.2 and the outbound interface is enp0s8
 
-Permanent networking configuration must be done in system files. For centos these configuration files are interface specific scripts and can be found in **/etc/sysconfig/network-scritps/ifcfg-interface_name**. Each configuration script contains a set of directives in the form of key value pairs that describe the networking configuration of that particular interface. The following are some directives that can be configured:
+Permanent interface networking configuration must be done in system files. For centos these configuration files are interface specific scripts and can be found in **/etc/sysconfig/network-scritps/ifcfg-interface_name**. Each configuration script contains a set of directives in the form of key value pairs that describe the networking configuration of that particular interface. The following are some directives that can be configured:
 
 - `BOOTPROTO=none|dhcp` Specifies whether the interface must request a dhcp address or uses local configuration contained in the script
 - `IPADDR=192.168.15.1` Sets static IPV4 network address
