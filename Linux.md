@@ -1,4 +1,4 @@
-# epam_intro_cloud_devops
+# Linux Bootcamp
 
 ## 1. Linux introduction
 
@@ -134,15 +134,15 @@ Text editor are used to create and edit plain text files. All linux distros supp
 
 When need to search for a file or directory within a the filesystem structute we can use three different commands: find, locate and grep
 
-- find: support various options to narrow down the search to find items based on its type like a regular file or a directory. It mainly work with the path that is given to complete the search, if the path is not specified by default searches all filesystem under /
+- find: support various options to narrow down the search to find items based on its type like a regular file or a directory. It mainly works with the path that is given to complete the search, if the path is not specified by default searches all filesystem under /
 
   `$ find /tmp -name core -type f -exec rm {} \; # The commands searchs within the /tmp folder a file with name core and then removes it`
 
 - locate: uses local database mlocate to quickly find locations of files or directores within the filesystem, mlocated is an indexed database located at /var/lib/mlocate with file names and therefore it is much faster to lookup for them since it does not the to scan the entire filesystem but rather find the corresponding entry in the mlocate.db file. The database is updated regularly but can be done by using the command updatedb.
 
-  `$ locate -br ^shadow$ # the command searches for filenames which their base contains only the word shadow`
+  `$ locate -br ^shadow$` The command searches for filenames which their base contains only the word shadow
 
-- grep: can be used to search for specific matches of contents in plain files using regular expressions. For instance maybe you want to find a file that you remember it had a definiton of a function called myfunc(). Since grep is to find patterns in files you need to specified the file to read from, if not specified it will read from STDIN
+- grep: can be used to search for specific matches of contents in plain files using regular expressions. For instance maybe you want to find a file that you remember it had a definiton of a function called myfunc(). Since grep is used to find patterns in files you need to specify the file to read from, if not specified it will read from current directory.
 
 `$ grep -r myfun . # With the option -r searches recursively the pattern myfun inside the plain files living under the specified path. The dot means to search in the current directory`
 
@@ -169,11 +169,11 @@ We see a couple a couple of examples here:
 
 - Command to recursively delete folder that contain certain name
 
-  `find /Downloads -name downterm -type d print0 | xargs -0 rm -vrf "{}" # print0 print output with null character as spacing instead of withespace, the -0 option of xargs command indicates the arguments are expected to be separated by the null character, the {} means the arguments from SDTIN`
+  `find /Downloads -name downterm -type d -print0 | xargs -0 rm -vrf "{}"` print0 print output with null character as spacing instead of withespace, the -0 option of xargs command indicates the arguments are expected to be separated by the null character, the {} means the arguments from SDTIN
 
 - Command to copy executable files from one location to another
 
-  `$ find -name *.sh -type f print0 | xargs -0 -i cp {} target_folder`
+  `$ find -name *.sh -type f -print0 | xargs -0 -i cp {} target_folder`
 
  ### 2.7 Working with archives
 
