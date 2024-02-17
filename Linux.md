@@ -203,9 +203,9 @@ In centos, all repositories are located in /etc/yum.repos.d/ as configuration fi
 
 - `$ sudo yum repolist` Lists enabled repositories in your system
 - `$ sudo yum repolist all` Lists enabled and disabled repositories in your system
-- `$ sudo yum-config-manager --enable/--disable <repo_name>` Enables/Disables repository
+- `$ sudo yum-config-manager --enable/--disable <repo_name> list available` Enables/Disables repository
 - `$ sudo yum-config-manager --add-repo <repo_url>` adds repository
-- `$ sudo yum --disablerepo="*" --enablerepo="ksplice-uptrack"` List available packages under repo ksplice-uptrack
+- `$ sudo yum --disablerepo="*" --enablerepo="ksplice-uptrack" list available` List available packages under repo ksplice-uptrack
 - `$ sudo yum history` Displays the history of transactions made with yum
 - `$ sudo yum history info <transaction_id>` Displays information about a particular transaction made with yum
 - `$ sudo yum history undo <transaction_id>` Undoes transaction made with yum
@@ -221,7 +221,8 @@ You can also create a customized repo under /etc/yum.repos.d/ by doing the follo
   baseurl=http://example.com/repo
   enabled=1
   gpgcheck=1
-  gpgkey=http://example.com/RPM-GPG-KEY-repo```
+  gpgkey=http://example.com/RPM-GPG-KEY-repo
+  ```
 - `$ sudo yum makecache` Update the yum cache to make the new repository available
   
 Package management:
@@ -232,7 +233,7 @@ Package management:
 - `$ sudo yum autoremove <package>` Removes a package and all its unused dependencies
 - `$ sudo yum check-updates` Check if packages have new version available
 - `$ sudo yum update <package>` Updates specified package, if not given then updates all packages with new version available
-- sudo yum remove --purge <package_name> Removes a package and its installed files
+- `$ sudo yum remove --purge <package_name>` Removes a package and its installed files
 - `$ rpm -qa | egrep <regex>` Lists all installed packages and filter by regex
 - `$ rpm -qf $(which command)` Check what package the specified command belongs to
 - `$ rpm -ql <package>)` Check what files were installed by package
@@ -340,9 +341,9 @@ Commands for users:
 - `$ finger username` Displays information about an user
 
 Commands for groups:
--`$ groupadd groupname` Adds group
--`$ groupdel groupname` Deletes group
--`$ groupmod -n newgroup groupname` Modfies group's name from groupname to newgroup
+- `$ groupadd groupname` Adds group
+- `$ groupdel groupname` Deletes group
+- `$ groupmod -n newgroup groupname` Modfies group's name from groupname to newgroup
 
 ### 4.2 Permission Model
 
@@ -373,7 +374,7 @@ There are other two extra permissions called **Set User ID (SUID)** and **Set Gr
 - `$ chmod u+xs file.sh` or `$ chmod 4755 file.sh` Adds the SUID bit for file.sh meaning any user can run this command on behalf of user owner
 - `$ chmod g+xs file.sh` or `$ chmod 2755 file.sh` Adds the GUID bit for file.sh meaning any user can run this command on behalf of group owner 
 
-Finally, for files and directories there is a extended permission set that is called special attributes. These attributes can be set by chattr and lsiter by lsattr
+Finally, for files and directories there is a extended permission set that is called special attributes. These attributes can be set by chattr and listed by lsattr
 
 - `$ lsattr filename/directory` Shows the special attributes set on the specified file or directory.
 - `$ chattr +i filename` Sets the special attribute flag i which means inmutable, file cannot be change or deleted, not even by root
@@ -404,7 +405,7 @@ Temporary networking configuration can be achieve by using the `$ ip ` command. 
 - `$ ip link show` Displays available interface cards and their statuses
 - `$ ip link set enp0s8 down` Turning down an interface card
 - `$ ip address add 192.16.15.1/24 dev enp0s8` Adds an static ip address to interface enp0s8
-- `$ ip route add 172.16.20.0/24 via 192.16.15.2 dev enp0s8 permanent` Adds a permanent static route for net 172.16.20.0/4 whose next hop is 192.16.15.2 and the outbound interface is enp0s8
+- `$ ip route add 172.16.20.0/24 via 192.16.15.2 dev enp0s8` Adds a temporary static route for net 172.16.20.0/4 whose next hop is 192.16.15.2 and the outbound interface is enp0s8
 
 Permanent interface networking configuration must be done in system files. For centos these configuration files are interface specific scripts and can be found in **/etc/sysconfig/network-scritps/ifcfg-interface_name**. Each configuration script contains a set of directives in the form of key value pairs that describe the networking configuration of that particular interface. The following are some directives that can be configured:
 
@@ -456,18 +457,18 @@ Some commands to interact with firewalld:
 - `$ firewall-cmd --info-service=ftp` Get information of an specific service
 - `$ firewall-cmd --panic-on|off` Dropping all packets
 
-  ### 5.4 Remote Access
+### 5.4 Remote Access
 
 Remote access is typically intented for performing administrative tasks on a remote machine. There are various protocols and GUI programs that can help in the establishment of remote connections. Some of them are:
 
 1. Protocols
-  - Telnet (insecure, not to be used over public networks)
-  - SSH (Recommended, it uses encryption)
+    - Telnet (insecure, not to be used over public networks)
+    - SSH (Recommended, it uses encryption)
 2. GUI programs
-  - winSCP
-  - Putty
-  - X11 (Protocol to forward GUI of a remote machine)
-  - VNC/Anydesk
+    - winSCP
+    - Putty
+    - X11 (Protocol to forward GUI of a remote machine)
+    - VNC/Anydesk
 
 Most of the time you will be using SSH utility to connect ot a remote host by using command line. The usage of SSH is as follows:
 
@@ -579,8 +580,8 @@ Log rotation configuration files are unique for each service and are located und
     delaycompress # Delay compression of rotated logs until next rotation cycle 
     create 0644 user group # Create new log file with owner "user" and group "group"
     }
-```
-- `$ sudo logrotate -d /etc/logrorate.d/example ` Checks log rotation configuration policy
+  ```
+- `$ sudo logrotate -d /etc/logrorate.d/example` Checks log rotation configuration policy
 - `$ sudo logrotate /etc/logrotate.d/example` Applies log rotation configuration policy and creates rotation if neede
 
 Logrotate is automatically scheduled to be run daily by as a cron job. The configuration can be found in **/etc/cron.daily/logrorate**
