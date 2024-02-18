@@ -424,6 +424,8 @@ Linux has various utilities for network related operations such as connectivity 
 - `$ tracepath google.com` display the path the packages take to reach the destination (may not be the same every time)
 - `$ host google.com` and `host 8.8.8.8` Translates domain names to ip addresses and viceversa, simple tool
 - `$ dig google.com` and `dig 8.8.8.8` Translates domain names to ip addresses and viceversa, advanced tool for troubleshooting DNS and performing advanced queries
+- `$ dig MX empam.com` looks for MX record
+- `$ nslookup -type=MX empam.com` looks for MX record
 - `$ nslookup google.com` and `nslookup 8.8.8.8` Translates domain names to ip addresses and viceversa, being replaced by dig
 - `$ tcpdump -i enps08` shows traffic being handled by interface enp0s8
 - `$ ss -tlnp` shows system listening connections on tcp ports
@@ -472,7 +474,8 @@ Remote access is typically intented for performing administrative tasks on a rem
 
 Most of the time you will be using SSH utility to connect ot a remote host by using command line. The usage of SSH is as follows:
 
-- `$ ssh-keygen -t rsa -c 4096` Generates ssh public-private key pair using RSA algorithm, the lenght of the key is set to be 4096 bits
+- `$ ssh-keygen -t rsa -b 4096 -C "username"` Generates ssh public-private key pair using RSA algorithm, the lenght of the key is set to be 4096 bits and the user is specified by -C option
+- `$ ssh-keygen -t rsa -b 4096 -C "username" -N '' -f /path/key` Generates ssh public-private key pair using RSA algorithm, -N means use given passphrase and -f means stored in specifies the output file
 - `$ ssh-copy-id remote@domain.com` Copies the pub key of current user to remote server, this allows for passwordless auth, when copied you can edit /etc/ssh/sshd_config file and set passwordauthentication to no
 - `$ ssh -i ~/.ssh/id_rsa remote@domain.com` Logins to remote machine using private key file indicated by -i option
 - `$ ssh remote@domain.com whoami&&pwd` Logins and executes the specified commands in the remote machine, then brings the output and terminates the session
@@ -546,7 +549,8 @@ To check the current RAM installed on the system we can run the following comman
 To check the current storage usage on system we can run the following commands:
 
 - `$ df -hT` Display the current storage space in all exsisting partitions. Option -T display installed filesystem in partition
-- `$du -sh path` Shows the current space occupied by path in partition
+- `$ df -i path` Shows the inode usage in path
+- `$ du -sh path` Shows the current space occupied by path in partition
 - `$ lsof` Displays the information of current system files opened by daemons, users or processes.
 - `$ lsof -c sshd` Display all the system files opened by command sshd
 - `$ iostat -c 4` Monitors and displays system input/output device load information from devices and partitions, the -c option specifies how often to update the output
