@@ -29,7 +29,7 @@ Interactive login shell reads:
 - `~/.bash_logout` User specific profile configuration when logout.
 
 Non-interactive login shell reads:
-- `~/bashrc` This file is usually referred to in ``~/bash_profile`
+- `~/bashrc` This file is usually referred to in `~/bash_profile`
 
 ### 1.4 Shell Programming
 
@@ -72,7 +72,7 @@ Once the script is written, you can execute it by calling
 
 ### 2.1 Bash Options
 
-Options are settings that change the shell or script behaviour. This options are added or removed by the set command. The set command follows the structure **set [-+]o option_name** or **set [-+abrv_option_name]** where the symbol "-" and "+" means add and remove options respectively. Figure 1 shows an example of set options.
+Options are settings that change the shell or script behaviour. This options are added or removed by the set command. The set command follows the structure **`set [-+]o option_name`** or **`set [-+abrv_option_name]`** where the symbol "`-`" and "`+`" means add and remove options respectively. Figure 1 shows an example of set options.
 
 <p align="center">
   <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/e44938f1-00f4-4b57-b863-15213b95a524"
@@ -111,5 +111,70 @@ A special character means a character that has an extended meaning when interpre
 
 ### 1.5 Variables
 
-Variables are key-values pairs that allows for temporary storage of information. Variables are labels that are assigned to RAM memory locations where the actual data is stored.
+Variables are key-values pairs that allows for temporary storage of information. Variables are labels that are assigned to RAM memory locations where the actual data is stored. It is always preferred to quote with "" the value of a variable to delimit its range, specially when assigning a list of values to an array variable. Also it's important to follow best practices for variable naming and assignment, always stick to the conventions used in existing scripts. A good guide for shell style guide can be found at <a href="https://google.github.io/styleguide/shellguide.html" target="_blank">Style Guide</a>
+
+To set a variable you can do one of the following:
+- `var1="Some value here"` Preferred for single value assignment
+- `var2=value` Less recommended for single value assignment
+- `var3=("value1 value2 value3" "value4 value 5 value6")` Preferred for multiple value assignment
+
+To access a variable you can do:
+- `echo "${var1}"` Preferred
+- `echo "$var2"` Acceptable
+- `echo $var3` Less recommended
+
+Variables in shell programming don´t have a type and normally they are interpreted as strings. However, depending on the context upon which those variables are invoked they allow arithmetic operations.
+
+Bash has an extended set of options for variable manipultation, we will explore some of them:
+
+**1. String Manipulation**  
+
+1.1 Get the variable length whether its a single value variable or an array
+   - `echo "${#var}"` Echoes the length variable or the lenth of the first item if variables is an array
+   - `echo "${#var[@]}"  | echo "${#var[*]}"` Echoes length of the array
+
+1.2 Get substring from string variable
+  - `echo "${var:start_position:subs_length}"` Gets substring starting from index start_position and length subs_length from string variable var
+
+1.3 left and right strip (deletion) of pattern from variable.
+  - `echo "${var#pattern}"` Non greedy left strip of pattern from variable var
+  - `echo "${var##pattern}"` Greedy left strip of pattern from variable var
+  - `echo "${var%pattern}"` Non greedy right strip of pattern from variable var
+  - `echo "${var%%pattern}"` Greedy right strip of pattern from variable var
+
+1.4 Pattern replacement from variable
+  - `echo "${var/pattern/replacement}"` Replace first occurence of pattern in the string var by replacement
+  - `echo "${var//pattern/replacement}"` Replace all occurence of pattern in the string var by replacement
+
+1.5 Prefix and sufix pattern replacement from variable
+  - `echo "${var/#pattern/replacement}"` Replace occurence of pattern on the left side of the string var by replacement
+  - `echo "${var/%pattern/replacement}"` Replace occurence of pattern in the right side of the string var by replacement
+
+**2. Parameter substitution**
+Parameter substitution allows the shell to react based on the presence (variable set with value), absence(variable not set) or nullability (variable set without a value) of a variable and use, set or modify a variable value
+
+2.1 Use default value if variable is not setted or if it's setted with a null value.
+- `${var-default}` Use default value if variable var is not setted
+- `${var:-default}` Use default value if variable is not setted or if variable is setted with a null value
+
+2.2 Set variable with default value if variable is not setted or if it's setted with a null value
+- `${var=default}` Set variable var with default value if variable is not setted
+- `${var:=default}` Set variable var with default value if variable is not setted or if variable is setted with a null value
+
+2.3 Use value if variable is setted or if it's setted with a null value. If variable is not setted it will use null string
+- `${var+value}` Use  value if variable var is setted
+- `${var+:value}` Use value if variable var is setted but has null value
+
+2.4 If variable is setted use it, otherwise use error message and exits script with exit code 1
+- `${var?err_msg}` Use err_msg if variable var is not setted and exit with code 1
+- `${var?:err_msg}` Use err_msg if variable var is setted but has null value and exit with code 1
+
+
+
+  
+
+
+
+
+
 
