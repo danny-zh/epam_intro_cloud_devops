@@ -125,12 +125,12 @@ To access a variable you can do:
 
 Variables in shell programming don´t have a type and normally they are interpreted as strings. However, depending on the context upon which those variables are invoked they allow arithmetic operations.
 
-Bash has an extended set of options for variable manipultation, we will explore some of them:
+Bash has an extended set of options for variable manipulation, we will explore some of them:
 
 **1. String Manipulation**  
 
 1.1 Get the variable length whether its a single value variable or an array
-   - `echo "${#var}"` Echoes the length variable or the lenth of the first item if variables is an array
+   - `echo "${#var}"` Echoes the length of the variable or the lenth of the first item if variable is an array
    - `echo "${#var[@]}"  | echo "${#var[*]}"` Echoes length of the array
 
 1.2 Get substring from string variable
@@ -147,11 +147,11 @@ Bash has an extended set of options for variable manipultation, we will explore 
   - `echo "${var//pattern/replacement}"` Replace all occurence of pattern in the string var by replacement
 
 1.5 Prefix and sufix pattern replacement from variable
-  - `echo "${var/#pattern/replacement}"` Replace occurence of pattern on the left side of the string var by replacement
-  - `echo "${var/%pattern/replacement}"` Replace occurence of pattern in the right side of the string var by replacement
+  - `echo "${var/#pattern/replacement}"` Replace occurence of pattern on the left side of the string var by replacement. This a greedy prefix replacement
+  - `echo "${var/%pattern/replacement}"` Replace occurence of pattern in the right side of the string var by replacement. This is a greedy sufix replacement
 
 **2. Parameter substitution**
-Parameter substitution allows the shell to react based on the presence (variable set with value), absence(variable not set) or nullability (variable set without a value) of a variable and use, set or modify a variable value
+Parameter substitution allows the shell to react based on the presence (variable set with value), absence(variable not set) or nullability (variable set without a value) of a variable and use, set or modify the variable's value
 
 2.1 Use default value if variable is not setted or if it's setted with a null value.
 - `${var-default}` Use default value if variable var is not setted
@@ -162,12 +162,100 @@ Parameter substitution allows the shell to react based on the presence (variable
 - `${var:=default}` Set variable var with default value if variable is not setted or if variable is setted with a null value
 
 2.3 Use value if variable is setted or if it's setted with a null value. If variable is not setted it will use null string
-- `${var+value}` Use  value if variable var is setted
+- `${var+value}` Use value if variable var is setted
 - `${var+:value}` Use value if variable var is setted but has null value
 
 2.4 If variable is setted use it, otherwise use error message and exits script with exit code 1
 - `${var?err_msg}` Use err_msg if variable var is not setted and exit with code 1
 - `${var?:err_msg}` Use err_msg if variable var is setted but has null value and exit with code 1
+
+
+Bash also manages some special variables types:
+
+- Local variables: Variables that live inside a code block, cannot be accesed from outside world
+    ```
+      func() {
+        var="$1"
+        echo "${var"
+      }
+      echo "${var}" #Echoes null string
+      func Hi! #Echoes positional paramenter Hi!
+    ```
+- Environment variables: Variables that affect the behaviour of the shell or the user interface. The environment variables can be set to:
+  - `/etc/environment` Change system-wide behaviour
+  - `export VAR=VALUE` Change current user shell behaviour
+  - `~/bash_profile; ~/bashrc` Change all sessions of user shell behaviour
+  - `. ~/env_vars or source ~/env_vars` set env variables from an script
+- Positional parameters: These are the arguments that are passed to an script
+  - `$1, $2, $3 ... ${n}` Means to access the nth argument passed to the script. If the argument is greater than 9, {} must be used to access it
+  - `$0` Means the name of the script being executed
+  - `$#` Means the number of arguments passed to the script
+  - `$* or $@` Means all the arguments passed to the script 
+- Built-in variables: Are the environment variables set and used by the system
+  - `env or printenv` Displays environment variables
+  - `set` Displays shell variables. These are temporary variables that exists as long as the shell does
+- Special variables: Are variables that can be used during script execution for advanced logic. Figure 4 shows special variables
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/edc95624-29c4-4b27-bb9d-5123ab298136"
+         alt="Figure 3" width="600" height="300"/>
+  <br/>
+  <em>Figure 4. Special Variables</em>
+</p>
+
+Bash also support arrays. Arrays are variables that hold multiple values. To access a particular value it can be referenced by its index.
+
+- `declare -a var` Explicitly declares variable var as an array
+- `var=("value 1" "value 2" "value 3")` Implicity declares variable var as an array
+- `var[4]="value"` Assigns a value to array var at index 4
+- `echo "${var[4]}"` Accesses to value at index 4 of the array variable var
+- `echo "${var[@]}" or echo "${var[*]}"` Accesses all values of array variable var
+- `declare -p var` Displays the type of the varible var, in this case an array
+
+1.6 Conditions
+
+Shell programming includes conditional logic, this allows for an advanced flow control of the scripts. In terms of conditions bash includes the following:
+
+- `$ test -f myfile && echo "exists" || echo "missing"` The test command, tests whether myfile is present in current directory. Returns 0 for true and 1 for false
+- `[ -f myfile ]` An abbreviation of the test command
+- `[[ -f myfile ]]` An extended set of the test command. Allows the use of && or || inside the condition where as single bracket [] generates an error
+- `let "a=1, b=2, c=a+b";echo "${c}"` The let command allows to perform arithmetic operation. This sets shell variables
+- `(( result = 1 + 3));echo $result` The (()) command is similar to let. Its used is preferred over let since it can be used directly in conditional statements
+- **if/elif** contructs
+  ```
+    if [[ condition1 ]]; then
+      command1
+      command2
+    elif [[ condition2 ]]; then
+      command4
+      command5
+    else
+      default-command
+    fi
+  ```
+- **case** constructs: Each case clause must be ended with ;;
+  ```
+    case EXPRESSION in
+      case1)
+        command1;
+        command2;
+      ;;
+      case2)
+        command3
+      ;;
+      …
+      caseN)
+        commandM
+      ;;
+    esac
+  ```
+- **Lists** constructs: the AND list and OR list constructs provide an easier way to replace complex nested if/elif statements. For AND list construct each command executes its turn only if the previous command exit code was true; for OR list construct each command executes its turn only if the previous command exit code was false.
+  ```
+    $ command-1 && command-2 && command-3 && ... command-n
+    $ command-1 || command-2 || command-3 || ... command-n
+  ```
+
+
 
 
 
