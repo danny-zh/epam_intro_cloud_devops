@@ -349,5 +349,27 @@ An example of code block STDIN redirection is as follows:
   done <<< $(echo "$PATH" | xargs -0 -d ":" -n 1)
 ```
 
+### 2.9 Functions
+
+Functions are litte pieces of code blocks that can be executed reapeatedly. The basic sintax to create a shell function is as shown below;
+
+```
+  function_name () {
+    commands
+  }
+```
+
+To invoke the function we simply follow:
+
+- `$ function_name $arg1 $arg2` Arguments are passed to the function independently whether the function processes them or not, the function receives them as positional arguments, i.e, $1, $2, ..., ${n}
+- `exit code_number` Functions can impement exiting of the script if a condition is met, for instance if an argument is missing. The code_number can range from 1 to 255.
+- `return code_number` Functions can impement the return of a code number. The return only quits from the function, not from the script. The code_number can range from 1 to 255.
+  
+
+
+
+
+
+
 
 
