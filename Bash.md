@@ -70,7 +70,7 @@ Once the script is written, you can execute it by calling
 - `$ bash script_file` Using Bash Shell
 - `./script_file` After adding executable (x) permission to the script file
 
-### 2.1 Bash Options
+### 2.2 Bash Options
 
 Options are settings that change the shell or script behaviour. This options are added or removed by the set command. The set command follows the structure **`set [-+]o option_name`** or **`set [-+abrv_option_name]`** where the symbol "`-`" and "`+`" means add and remove options respectively. Figure 1 shows an example of set options.
 
@@ -83,11 +83,11 @@ Options are settings that change the shell or script behaviour. This options are
 
 Some examples:
 
-- `set -ex` Exits (-e) the script if a status code diferent than 0 is returned from a command exept in loops and list construct. Prints (-x) commands and its argumments as they are executed
+- `set -ex` Exits (-e) the script if a status code diferent than 0 is returned from a command except in loops and list construct (AND/OR). Prints (-x) commands and its argumments as they are executed
 - `set -u` Exits (-u) the script if attempt to reading a variable that is not defined
 - `set -o pipefail` Exits (-o pipefile) the script if a pipeline command return a non-zero value
 
-### 1.3 Exit Codes
+### 2.3 Exit Codes
 
 Exit codes are returned by commands to indicate the final status of its execution. Exit codes can range from 0 to 255, an exit code different to 0 indicates that the command ran into an error during its execution; depending of the exit code number you can figure out what happened. Figure 2 shows the list of error codes returned by commands.
 
@@ -98,7 +98,7 @@ Exit codes are returned by commands to indicate the final status of its executio
   <em>Figure 2. Exit codes</em>
 </p>
 
-### 1.4 Special Characters
+### 2.4 Special Characters
 
 A special character means a character that has an extended meaning when interpreted by the shell. Some of the special characters are shown in figure 3. The special characters can be used directly into the shell or in a script file.
 
@@ -109,7 +109,7 @@ A special character means a character that has an extended meaning when interpre
   <em>Figure 3. Special Characters</em>
 </p>
 
-### 1.5 Variables
+### 2.5 Variables
 
 Variables are key-values pairs that allows for temporary storage of information. Variables are labels that are assigned to RAM memory locations where the actual data is stored. It is always preferred to quote with "" the value of a variable to delimit its range, specially when assigning a list of values to an array variable. Also it's important to follow best practices for variable naming and assignment, always stick to the conventions used in existing scripts. A good guide for shell style guide can be found at <a href="https://google.github.io/styleguide/shellguide.html" target="_blank">Style Guide</a>
 
@@ -127,45 +127,45 @@ Variables in shell programming don´t have a type and normally they are interpre
 
 Bash has an extended set of options for variable manipulation, we will explore some of them:
 
-**1. String Manipulation**  
+**2.5.1 String Manipulation**  
 
-1.1 Get the variable length whether its a single value variable or an array
+2.5.1.1 Get the variable length whether its a single value variable or an array
    - `echo "${#var}"` Echoes the length of the variable or the lenth of the first item if variable is an array
    - `echo "${#var[@]}"  | echo "${#var[*]}"` Echoes length of the array
 
-1.2 Get substring from string variable
+2.5.1.2 Get substring from string variable
   - `echo "${var:start_position:subs_length}"` Gets substring starting from index start_position and length subs_length from string variable var
 
-1.3 left and right strip (deletion) of pattern from variable.
+2.5.1.3 left and right strip (deletion) of pattern from variable.
   - `echo "${var#pattern}"` Non greedy left strip of pattern from variable var
   - `echo "${var##pattern}"` Greedy left strip of pattern from variable var
   - `echo "${var%pattern}"` Non greedy right strip of pattern from variable var
   - `echo "${var%%pattern}"` Greedy right strip of pattern from variable var
 
-1.4 Pattern replacement from variable
+2.5.1.4 Pattern replacement from variable
   - `echo "${var/pattern/replacement}"` Replace first occurence of pattern in the string var by replacement
   - `echo "${var//pattern/replacement}"` Replace all occurence of pattern in the string var by replacement
 
-1.5 Prefix and sufix pattern replacement from variable
+2.5.1.5 Prefix and sufix pattern replacement from variable
   - `echo "${var/#pattern/replacement}"` Replace occurence of pattern on the left side of the string var by replacement. This a greedy prefix replacement
   - `echo "${var/%pattern/replacement}"` Replace occurence of pattern in the right side of the string var by replacement. This is a greedy sufix replacement
 
-**2. Parameter substitution**
+**2.5.2 Parameter substitution**
 Parameter substitution allows the shell to react based on the presence (variable set with value), absence(variable not set) or nullability (variable set without a value) of a variable and use, set or modify the variable's value
 
-2.1 Use default value if variable is not setted or if it's setted with a null value.
+2.5.2.1 Use default value if variable is not setted or if it's setted with a null value.
 - `${var-default}` Use default value if variable var is not setted
 - `${var:-default}` Use default value if variable is not setted or if variable is setted with a null value
 
-2.2 Set variable with default value if variable is not setted or if it's setted with a null value
+2.5.2.2 Set variable with default value if variable is not setted or if it's setted with a null value
 - `${var=default}` Set variable var with default value if variable is not setted
 - `${var:=default}` Set variable var with default value if variable is not setted or if variable is setted with a null value
 
-2.3 Use value if variable is setted or if it's setted with a null value. If variable is not setted it will use null string
+2.5.2.3 Use value if variable is setted or if it's setted with a null value. If variable is not setted it will use null string
 - `${var+value}` Use value if variable var is setted
 - `${var+:value}` Use value if variable var is setted but has null value
 
-2.4 If variable is setted use it, otherwise use error message and exits script with exit code 1
+2.5.2.4 If variable is setted use it, otherwise use error message and exits script with exit code 1
 - `${var?err_msg}` Use err_msg if variable var is not setted and exit with code 1
 - `${var?:err_msg}` Use err_msg if variable var is setted but has null value and exit with code 1
 
@@ -198,7 +198,7 @@ Bash also manages some special variables types:
 
 <p align="center">
   <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/edc95624-29c4-4b27-bb9d-5123ab298136"
-         alt="Figure 3" width="600" height="300"/>
+         alt="Figure 4" width="600" height="300"/>
   <br/>
   <em>Figure 4. Special Variables</em>
 </p>
@@ -212,7 +212,7 @@ Bash also support arrays. Arrays are variables that hold multiple values. To acc
 - `echo "${var[@]}" or echo "${var[*]}"` Accesses all values of array variable var
 - `declare -p var` Displays the type of the varible var, in this case an array
 
-1.6 Conditions
+2.6 Conditions
 
 Shell programming includes conditional logic, this allows for an advanced flow control of the scripts. In terms of conditions bash includes the following:
 
@@ -221,7 +221,7 @@ Shell programming includes conditional logic, this allows for an advanced flow c
 - `[[ -f myfile ]]` An extended set of the test command. Allows the use of && or || inside the condition where as single bracket [] generates an error
 - `let "a=1, b=2, c=a+b";echo "${c}"` The let command allows to perform arithmetic operation. This sets shell variables
 - `(( result = 1 + 3));echo $result` The (()) command is similar to let. Its used is preferred over let since it can be used directly in conditional statements
-- **if/elif** contructs
+- **if/elif** constructs
   ```
     if [[ condition1 ]]; then
       command1
@@ -255,14 +255,99 @@ Shell programming includes conditional logic, this allows for an advanced flow c
     $ command-1 || command-2 || command-3 || ... command-n
   ```
 
+### 2.7 Loops
+
+Loops are control instructions that iterates over the same block of code until the control condition statement is met. In shell programming there three types of loops:
+
+- For: Iterates over a set on known values
+  ```
+      for file in "$( find . -type l )"; do
+        echo "$file"
+      done | sort
+  ```
+- While: Iterates while the control condition is true (returns exit code 0)
+  ```
+    while [ "$a" -le $LIMIT ] ; do
+      echo -n "$a "
+      let "a+=1"
+    done
+  ```
+- Until: Iterates until the control condition becomes true (returns exit code 0)
+  ```
+    until [ condition-is-true ] ; do
+      command(s)…
+    done
+  ```
+
+### 2.8 I/O Redirection
+
+In linux there is the concept of file descriptors which represent an unique number identifier that is associated to each opened file or other system input/output resources. File descriptors are normally used by programs to read from or to write to those opened files or input/output resources. By default there are always three files opened that refers to the default file descriptors 0, 1 and 2 respectively.
+
+- STDIN (file descriptor &0): The keyboard
+- STDOUT (file descriptor &1): The screen
+- STDERR (file descriptor &2): Error message output to the screen
+
+All the opened files or system input/output resources can be redirected. I/O redirection means capturing the output of a file, command, script, program or a code block and sending it as input to another file, command, script or program. The redirection normally uses the default file descriptors and are referred to as STDIN redirection (&0), STDOUT redirection (&1) and STDERR redirection (&2)
+
+- STDIN Redirection: Redirects the input for a file, command, script, program or code block. To redirect STDIN you have to use "<"
+  - `$ grep keyword < filename` Redirects the contents of filename as input to the grep command, then grep search inside the content for the keyword.
+- STDOUT Redirection: Redirects the output of a file, command, script, program or code block. To redirect STDOUT you have to use "1> or >". In STDOUT if the write to file doesn't exist, it is created.
+  -`$ ls -la > file_list.txt` Redirects the ouput of the command ls -la to the file file_list.txt
+  -`: > file_list.txt` Truncates the file file_list.txt to zero length
+  -`$ ls -la >> file_list.txt` Redirects the ouput of the command ls -la and appends it to the end of the file file_list.txt
+- STDERR Redirection: Redirects the error message of a file, command, script, program or code block. To redirect STDERR you have to use "2>". In STDERR if the write to file doesn´t exist, it is created
+  -`$ cat file 2> error_messages.txt` Redirects the error message generated by the command cat to the file error_message.txt
+  -`$ cat file 2>> error_messages.txt` Redirects the error message generated by the command cat and appends it to the end of file error_message.txt
+  -`$ cat file 1> messages.txt 2>&1` Redirects the error message generated by the command cat to the file descriptor &1
+  -`$ cat file &> messages.txt ` Redirects both STDOUT and STDERR to the specified file.
 
 
+Another redirection similar to that of STDIN can be achieved by using "here documents" and "here strings"
+
+- Here documents or here doc (<<DELIMITER): This type of redirection instructs the shell to read input from the current source until a line containing only delimiter (with no trailing blanks) is seen. All of the lines read up to that point are then used as the standard input for a command.
+  - `$ cat << EOF > lines.txt` It will read all the lines input by keyboard until it sees the delimiter EOF. The the output is redirected to file lines.txt
+
+- Here strings (<<<$command): It is a version of a here doc, the $command it's expanded and the result fed to the STDIN of the target.
+  - `$ cat <<< $PATH` It will expand the env variable $PATH and fed into the STDIN of cat
 
 
+Another redirection similar to that of STDOUT can be performed with the PIPE operator "|", this operator allows to chain up multiple commands
+
+- `$ cat file | cut -d":" -f1 | sort > result.file` Example of pipe operator
+- `$ echo "${PIPESTATUS[@]}"` Echoes the exit codes status of each command executed in the pipe
+
+In linux there are some other special filenames as ilustrated in the figure 5
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/8eecb1c4-f8f6-4115-a5f4-1ac23df7c86b"
+         alt="Figure 5" width="600" height="300"/>
+  <br/>
+  <em>Figure 5. Special Filenames</em>
+</p>
+
+An example for using a file descriptor with special filename /dev/tcp to set up a tcp network connection to a host
+  `$ exec 4<>/dev/tcp/google.com/80` Opens tcp connection to google.com and assigns it to file descriptor 4
+  `$ echo -e "GET /HTTP/1.0\n" >&4` Send get request to the opened connection using STDOUT to file descriptor 4
+  `$ cat <&4` STDIN to cat command the contents of the response from file descriptor 4
+  `$ exec 4<&-` Release the file descriptor 4
   
+An example of code block STDIN redirection is as follows:
 
+- Using for loop
+```
+  #!/bin/bash
+  for arg in $(cat); do
+    echo "${arg:-none}"
+  done <<< $(echo "$PATH" | xargs -0 -d ":" -n 1)
+```
 
-
+- Using while loop
+```
+  #!/bin/bash
+  while IFS= read -r line; do
+    echo "${line:-none}"
+  done <<< $(echo "$PATH" | xargs -0 -d ":" -n 1)
+```
 
 
 
