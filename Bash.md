@@ -365,11 +365,149 @@ To invoke the function we simply follow:
 - `exit code_number` Functions can impement exiting of the script if a condition is met, for instance if an argument is missing. The code_number can range from 1 to 255.
 - `return code_number` Functions can impement the return of a code number. The return only quits from the function, not from the script. The code_number can range from 1 to 255.
   
+## 3. Bash Style Guide
 
+### 3.1 Environment
 
+All error messages should go to STDERR. This makes it easir to separate them from normal messages. A print status error function is recommended.
 
+```
+  error ()
+  {
+    echo "Error: [$(date +"%Y-%m-%dT%H:%M:%S%Z")] $*" >2 #Redirection to STDERR
+  }
 
+  if ! do_something; then
+    error "Unable to do something"
+    exit 1
+  fi
+```
 
+### 3.2 Comments
 
+Comments are important for other users who will maintain the code to understand the purpose and behaviour of your scripts. You have to comment:
 
+- File header comments: Includes a brief overview and description of the script.
+```
+  #!/bin/bash
+  #
+  # Perform hot backups of Oracle databases.
+```
+- Functions comments: Describes the purpose of the functions as well as the global parameters used and modified, the input arguments, the output to STDOUT or STDERR, and the return code
+
+```
+  #######################################
+  # Cleanup files from the backup directory.
+  # Globals:
+  #   BACKUP_DIR
+  #   ORACLE_SID
+  # Arguments:
+  #   Backup path
+  # Output:
+  #   Write success to STDOUT or failure to STDERR
+  # Return:
+  #   Non-zero on error
+  #######################################
+  function cleanup() {
+    …
+  }
+```
+- Implementation comments: Describes tricky, non-obvious or interesting parts of your code
+- TODO comments: Use TODO comments for code that is temporary, a short-term solution, or good-enough but not perfect. Describes pending tasks to be completed.
+```
+  # TODO(mrmonkey): Handle the unlikely edge cases (bug ####)
+```
+
+### 3.3 Formatting
+
+Formatting refers to the use of the best practices when writing an script. It is helpful to maintain an uniform formatting style along all the scripts specially when those are mantained by other members, this is intended to keep consistency. Some rules to keep formatting are:
+
+- Identation: Use 2 whitespaces, not tabs. For code block separation use 1 blank line
+- Line length and long strings: Maximum line length is 80 characters. If larger than that you can use a here document (<<EOF) or embedded new lines in the string are also ok
+  ```
+    cat <<END
+    I am an exceptionally long
+    string.
+    END
+    
+    # Embedded newlines are ok too
+    long_string="I am an exceptionally
+    long string."
+  ```
+
+- Pipelines (|, &&, ||): All chained commands must fit into a single line. If not you have to split each command line by line with the pipe (|) or logical compounds (||, &&) in the beginning of the new line and use 2 whitespaces after that for writing the command
+
+```
+  # All fits on one line
+  $ command1 | command2
+  
+  # Long commands
+  $ command1 \
+    | command2 \
+    | command3 \
+    | command4
+```
+- Loop: Put "; do" and "; then" on the same line as the while, for or if. Else statement should be in his own line.
+- Case statement: Ident alternatives by 2 whitespaces. A white space must be added after the closing parentheses of the pattern.
+
+```
+  case "${expression}" in
+    a) 
+      variable="…"
+      some_command "${variable}" "${other_expr}" …
+      ;;
+    absolute) 
+      actions="relative"
+      another_command "${actions}" "${other_expr}" …
+      ;;
+    *) 
+      error "Unexpected expression '${expression}'"
+      ;;
+  esac
+
+  # Simple commands may be put on the same line as the pattern and ;; as long as they keep simple and readable
+  verbose='false'
+  aflag=''
+  bflag=''
+  files=''
+  while getopts 'abf:v' flag; do
+    case "${flag}" in
+      a) aflag='true' ;;
+      b) bflag='true' ;;
+      f) files="${OPTARG}" ;;
+      v) verbose='true' ;;
+      *) error "Unexpected option ${flag}" ;;
+    esac
+  done
+```
+
+- Variable expansion:
+  - Stay consistent
+  - Don’t brace-delimit single character shell specials or positional parameters, unless strictly necessary for avoiding deep confusion.
+  - Prefer brace-delimiting all other variables. Prefer "${var}" over "$var".
+    
+  ```
+    # Section of *recommended* cases.
+    
+    # Preferred style for 'special' variables:
+    echo "Positional: $1" "$5" "$3"
+    echo "Specials: !=$!, -=$-, _=$_. ?=$?, #=$# *=$* @=$@ \$=$$ …"
+    
+    # Braces necessary:
+    echo "many parameters: ${10}"
+    
+    # Braces avoiding confusion:
+    # Output is "a0b0c0"
+    set -- a b c
+    echo "${1}0${2}0${3}0"
+    
+    # Preferred style for other variables:
+    echo "PATH=${PATH}, PWD=${PWD}, mine=${some_var}"
+  ```
+
+- Quoting:
+  - 'Single' quotes indicate that no substitution is desired.
+  - "Double" quotes indicate that substitution is required/tolerated.
+ 
+### 3.4 Naming Conventions
 
