@@ -210,6 +210,7 @@ Bash also support arrays. Arrays are variables that hold multiple values. To acc
 - `var[4]="value"` Assigns a value to array var at index 4
 - `echo "${var[4]}"` Accesses to value at index 4 of the array variable var
 - `echo "${var[@]}" or echo "${var[*]}"` Accesses all values of array variable var
+- `ècho ${#var[@]}` Prints the length of the array
 - `declare -p var` Displays the type of the varible var, in this case an array
 
 2.6 Conditions
@@ -393,7 +394,7 @@ Comments are important for other users who will maintain the code to understand 
   #
   # Perform hot backups of Oracle databases.
 ```
-- Functions comments: Describes the purpose of the functions as well as the global parameters used and modified, the input arguments, the output to STDOUT or STDERR, and the return code
+- Functions comments: Any function that is not both obvious and short must be commented. Any function in a library must be commented regardless of length or complexity. The function comment describes the purpose of the functions as well as the global parameters used and modified, the input arguments, the output to STDOUT or STDERR, and the return code
 
 ```
   #######################################
@@ -424,16 +425,17 @@ Formatting refers to the use of the best practices when writing an script. It is
 
 - Identation: Use 2 whitespaces, not tabs. For code block separation use 1 blank line
 - Line length and long strings: Maximum line length is 80 characters. If larger than that you can use a here document (<<EOF) or embedded new lines in the string are also ok
-  ```
-    cat <<END
-    I am an exceptionally long
-    string.
-    END
+
+```
+  cat <<END
+  I am an exceptionally long
+  string.
+  END
     
-    # Embedded newlines are ok too
-    long_string="I am an exceptionally
-    long string."
-  ```
+  # Embedded newlines are ok too
+  long_string="I am an exceptionally
+  long string."
+```
 
 - Pipelines (|, &&, ||): All chained commands must fit into a single line. If not you have to split each command line by line with the pipe (|) or logical compounds (||, &&) in the beginning of the new line and use 2 whitespaces after that for writing the command
 
@@ -450,64 +452,164 @@ Formatting refers to the use of the best practices when writing an script. It is
 - Loop: Put "; do" and "; then" on the same line as the while, for or if. Else statement should be in his own line.
 - Case statement: Ident alternatives by 2 whitespaces. A white space must be added after the closing parentheses of the pattern.
 
-```
-  case "${expression}" in
-    a) 
-      variable="…"
-      some_command "${variable}" "${other_expr}" …
-      ;;
-    absolute) 
-      actions="relative"
-      another_command "${actions}" "${other_expr}" …
-      ;;
-    *) 
-      error "Unexpected expression '${expression}'"
-      ;;
-  esac
-
-  # Simple commands may be put on the same line as the pattern and ;; as long as they keep simple and readable
-  verbose='false'
-  aflag=''
-  bflag=''
-  files=''
-  while getopts 'abf:v' flag; do
-    case "${flag}" in
-      a) aflag='true' ;;
-      b) bflag='true' ;;
-      f) files="${OPTARG}" ;;
-      v) verbose='true' ;;
-      *) error "Unexpected option ${flag}" ;;
+  ```
+    case "${expression}" in
+      a) 
+        variable="…"
+        some_command "${variable}" "${other_expr}" …
+        ;;
+      absolute) 
+        actions="relative"
+        another_command "${actions}" "${other_expr}" …
+        ;;
+      *) 
+        error "Unexpected expression '${expression}'"
+        ;;
     esac
-  done
-```
+  
+    # Simple commands may be put on the same line as the pattern and ;; as long as they keep simple and readable
+    verbose='false'
+    aflag=''
+    bflag=''
+    files=''
+    while getopts 'abf:v' flag; do
+      case "${flag}" in
+        a) aflag='true' ;;
+        b) bflag='true' ;;
+        f) files="${OPTARG}" ;;
+        v) verbose='true' ;;
+        *) error "Unexpected option ${flag}" ;;
+      esac
+    done
+  ```
 
 - Variable expansion:
   - Stay consistent
   - Don’t brace-delimit single character shell specials or positional parameters, unless strictly necessary for avoiding deep confusion.
   - Prefer brace-delimiting all other variables. Prefer "${var}" over "$var".
     
-  ```
-    # Section of *recommended* cases.
-    
-    # Preferred style for 'special' variables:
-    echo "Positional: $1" "$5" "$3"
-    echo "Specials: !=$!, -=$-, _=$_. ?=$?, #=$# *=$* @=$@ \$=$$ …"
-    
-    # Braces necessary:
-    echo "many parameters: ${10}"
-    
-    # Braces avoiding confusion:
-    # Output is "a0b0c0"
-    set -- a b c
-    echo "${1}0${2}0${3}0"
-    
-    # Preferred style for other variables:
-    echo "PATH=${PATH}, PWD=${PWD}, mine=${some_var}"
-  ```
+```
+  # Section of *recommended* cases.
+  
+  # Preferred style for 'special' variables:
+  echo "Positional: $1" "$5" "$3"
+  echo "Specials: !=$!, -=$-, _=$_. ?=$?, #=$# *=$* @=$@ \$=$$ …"
+  
+  # Braces necessary:
+  echo "many parameters: ${10}"
+  
+  # Braces avoiding confusion:
+  # Output is "a0b0c0"
+  set -- a b c
+  echo "${1}0${2}0${3}0"
+  
+  # Preferred style for other variables:
+  echo "PATH=${PATH}, PWD=${PWD}, mine=${some_var}"
+```
 
 - Quoting:
   - 'Single' quotes indicate that no substitution is desired.
   - "Double" quotes indicate that substitution is required/tolerated.
  
 ### 3.4 Naming Conventions
+
+- Function names: Lowercase with underscore to separate words and "::" to separate libraries (packagers). The keyword function is optinal, but its use or dimiss should be consistent.
+
+```
+  # Single function
+  my_func() {
+    …
+  }
+  
+  # Part of a package
+  mypackage::my_func() {
+    …
+  }
+```
+
+- Variable names: Variables names for loops should be similarly named for any variable you’re looping through.
+
+```
+  for zone in "${zones[@]}"; do
+    something_with "${zone}"
+  done
+```
+
+- Contants and environment variables names: Must be declared at the top of the file. Use uppercase and underscore to separate words. Some things become constant at their first setting (for example, via getopts). Thus, it’s OK to set a constant in getopts or based on a condition, but it should be made readonly immediately afterwards. For the sake of clarity readonly or export is recommended instead of the equivalent declare commands.
+
+```
+  # Constant
+  readonly PATH_TO_FILES='/some/path'
+  
+  # Both constant and environment
+  declare -xr ORACLE_SID='PROD' #-r means readonly, -x means export to env
+
+  VERBOSE='false'
+  while getopts 'v' flag; do
+    case "${flag}" in
+      v) VERBOSE='true' ;;
+    esac
+  done
+  readonly VERBOSE
+```
+- Local variables: Declare local variables that are specific inside the functions you create. Declaration and assignment should be on different lines.
+```
+  my_func2() {
+    # Separate lines for declaration and assignment:
+    local my_var
+    my_var="$(my_func)"
+    (( my_Var == 0 )) || return
+  }
+```
+
+- Function location: Declare all functions just below the all the constants. Do not include executable code between functions as debugging become nasty.
+- Main function: For scrtips long enough you can define a main function as the botton one in the functions definitions. The main function allows to encapsulate the main code and can help to quickly identify where the program starts. Besides that, main also support to define other local variables that would be impossible to named as local if used outside a function block scope. To call the main function just do "main $@"
+
+### 3.4 Calling Commands
+
+Allows to check the status of the the commads called in a script.
+
+- Checking return values: Always check return values and give informative return values. For unpiped commands can use "#?" direcltly or also can use an id statement
+
+```
+  if ! mv "${file_list[@]}" "${dest_dir}/"; then
+    echo "Unable to move ${file_list[*]} to ${dest_dir}" >&2
+    exit 1
+  fi
+  
+  # Or
+  mv "${file_list[@]}" "${dest_dir}/"
+  if (( $? != 0 )); then
+    echo "Unable to move ${file_list[*]} to ${dest_dir}" >&2
+    exit 1
+fi
+```
+
+- Pipestatus: For pipes you can check the return values of all commands in the pipe. Pipestatus is overwritten by following comands after the pipe, that's why to keep the code statuses of the pipe you can assign them to a variable. Specially if you need to react differently to code statuses of each command.
+```
+  tar -cf - ./* | ( cd "${DIR}" && tar -xf - )
+  return_codes=( "${PIPESTATUS[@]}" )
+  if (( return_codes[0] != 0 )); then
+    do_something
+  fi
+  if (( return_codes[1] != 0 )); then
+    do_something_else
+  fi
+```
+- Built-in Command Vs External Commands: Given the choice of using built-in and external commands that can carry the task, prefer to use built-in commands since they are more portable and robust. External commands will invoke another process.
+
+```
+  # Prefer this:
+  addition=$(( X + Y ))
+  substitution="${string/#foo/bar}" #Built-in shell prefix substitution
+  
+  # Instead of this:
+  addition="$(expr "${X}" + "${Y}")"
+  substitution="$(echo "${string}" | sed -e 's/^foo/bar/')"
+```
+
+## 4. Text Processor: AWK & SED
+
+### 4.1 AWK Overview
+
 
