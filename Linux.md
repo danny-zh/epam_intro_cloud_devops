@@ -134,7 +134,7 @@ Text editor are used to create and edit plain text files. All linux distros supp
 
 When need to search for a file or directory within a the filesystem structute we can use three different commands: find, locate and grep
 
-- find: support various options to narrow down the search to find items based on its type like a regular file or a directory. It mainly works with the path that is given to complete the search, if the path is not specified by default searches all filesystem under /
+- find: support various options to narrow down the search to find items based on its type like a regular file or a directory. It mainly works with the path that is given to complete the search, if the path is not specified by default searches all filesystem under . (current directory)
 
   `$ find /tmp -name core -type f -exec rm {} \; # The commands searchs within the /tmp folder a file with name core and then removes it`
 
@@ -142,7 +142,7 @@ When need to search for a file or directory within a the filesystem structute we
 
   `$ locate -br ^shadow$` The command searches for filenames which their base contains only the word shadow
 
-- grep: can be used to search for specific matches of contents in plain files using regular expressions. For instance maybe you want to find a file that you remember it had a definiton of a function called myfunc(). Since grep is used to find patterns in files you need to specify the file to read from, if not specified it will read from current directory.
+- grep: can be used to search for specific matches of contents in plain files using regular expressions. For instance maybe you want to find a file that you remember it had a definiton of a function called myfunc(). Since grep is used to find patterns in files you need to specify the file to read from, if not specified it will read from STDIN.
 
 `$ grep -r myfun . # With the option -r searches recursively the pattern myfun inside the plain files living under the specified path. The dot means to search in the current directory`
 
@@ -191,7 +191,7 @@ Tools we can use for both purposes of archiving and compresing are tar, zip and 
 
 - Decompressing and unarchiving files from compressed archived file object
 
-    `$ tar -xvzg images.tgz # -x option means extract`
+    `$ tar -xvzf images.tgz # -x option means extract`
 
 ## 3. Package Management
 ### 3.1 Sofware Management
@@ -228,6 +228,7 @@ You can also create a customized repo under /etc/yum.repos.d/ by doing the follo
 Package management:
 
 - `$ yum list installed <package>` List installed package version, if package is not given lists all packages installed on system
+- `$ yum info <package>` Displays info of package including version, from which repo was installed
 - `$ yum search <package>`Search package in enabled system repositories
 - `$ yum provides <command|file>` Search what package provides the command or file
 - `$ sudo yum autoremove <package>` Removes a package and all its unused dependencies
@@ -298,7 +299,7 @@ Some examples of scheduled jobs using crontab systax are:
 
 - Execute echo command every 3 minutes and redirect its STDOUT and SDTERR to file
 
-  `*/3 * * * * /bin/echo "Executed commmand" 2>&1 outputfile.log`
+  `*/3 * * * * /bin/echo "Executed commmand" > outputfile.log 2>&1 `
   
 - Execute echo command at 05:00 PM from monday to friday during the month of March
 
@@ -494,7 +495,7 @@ host remote_prod_server1
 
 Lastly, a very useful concept is about bastion host. This scenario is when you use an intermediary computer/server to login to another computer/server. Think of it as a "cascade login". For example, user in host A logins to host B and then from host B logins to host C. The command to achieve such behaviour with SSH is a proxy command. 
 
-- `$ ssh -i key_for_hostB -o "ProxyCommand ssh -W %h:%p -i key_for_hostC host_c@hostc_domain.com" hostb@hostb_domain.com` The -o option in the ssh command means that a proxycommand option will be used.
+- `$ ssh -i key_for_hostB -o "ProxyCommand ssh -W %h:%p -i key_for_hostC host_b@hostb_domain.com" hostc@hostc_domain.com` The -o option in the ssh command means that a proxycommand option will be used.
 
 ## 6. Monitoring, Process Control, Logs
 
@@ -548,6 +549,7 @@ To check the current RAM installed on the system we can run the following comman
 
 To check the current storage usage on system we can run the following commands:
 
+- `$ lsblk` Displays hardware disk attached on system
 - `$ df -hT` Display the current storage space in all exsisting partitions. Option -T display installed filesystem in partition
 - `$ df -i path` Shows the inode usage in path
 - `$ du -sh path` Shows the current space occupied by path in partition
