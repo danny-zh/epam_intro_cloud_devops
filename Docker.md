@@ -119,6 +119,23 @@ Regarding the storage drivers also referred to as graph drivers derived from thi
 
 Devicemapper and BTRFS is what you should look for when running container in production environment. The difference between them is that Device Mapper works perfectly when you have prepared an underlying filesystem of the device. Btrfs requires the btrfs filesystem on the piece of your filesystem, where Docker will keep all files
 
+
+### 1.2 Working with Docker. Docker Hub and Registry
+
+ #### Docker Services
+
+The docker daemon (server side) listens on unix socket /var/run/docker.sock for docker client API calls. The process is as follows:
+
+1. The docker client issues the instruction to run a container by using command `$ docker run image_id|name`
+2. Docker daemon
+ - Pulls the image from registry if it does not exist locally
+ - Creates new container
+ - Allocates filesystem and mount the read/write layer for the container
+ - Allocates bridge network interface
+ - Allocated IP address
+ - Executes process you indicated and captures the output.
+3. After that you can manage your container with `$ docker exec -it container_id|name /bin/bash`
+
 #### Docker commands
 
 The following are some command for stating with docker
@@ -136,7 +153,7 @@ The following are some command for stating with docker
 - `$ docker search registry_name` Lista stored image from repo registry
 - `$ docker container ls --all or docker ps --all` List all containers
 6. Stop/remove container, remove image
-- `$ docker stop container_id|name` Stops container
+- `$ docker stop container_id|name` Stops container using SIGTERM signal to gracefully terminate it.
 - `$ docker rm container_id|name` Removes container
 - `$ docker rm -f container_id|name` Stops and removes container
 - `$ docker rmi image_id|name` Removes image
@@ -146,6 +163,50 @@ The following are some command for stating with docker
 8. Launh container in the same namespace as other running container (advanced options)
 - `$ docker run --network=container:existing_container_name_or_id your_image_name` Launch new container in the same network namespace as running container
 - `$ docker run --pid=container:existing_container_name_or_id your_image_name` Launch new container in the same pid namespace as running container
-
+9. See docker info:
+- `$ docker info -f "{{json .}}"` Provides a lot of important information like how many containers in the system now, information about running, paused and stopped containers, images and server configuration and storage driver being used for running containers
+10. Run a image from a modified container
+- `$ docker commit contaner_id|name new_image_name` Commits the container changed status to a new image. This is rarely used but worth knowing
+- `$ docker run new_image_name` Runs new container from new image derived from old container
+11. Login to a remote repository to search, pull and push images
+- `$ docker login remote.repository.com` Docker will ask for username and password
+12. Search for an image in the defined repo:
+- `$ docker search remote.repository.com/image:tag`
   
- 
+#### Docker Container Daemon Configuration
+
+The docker daemon can be run with customized configuration. Such case is useful for example for debbuging. Dockerd can be configured either by json file or by flag parameters. The configuration json file is located under **etc/docker/daemon.json**. The following is an example that configures dockerd in debug mode, uses TLS, and listens for the traffic routed to 192.168.59.3 on port 2376
+
+```
+  {
+        "debug": true,
+        "tls": true,
+        "tlscert": "/var/docker/server.pem",
+        "tlskey": "/var/docker/serverkey.pem",
+        "hosts": ["tcp://192.168.59.3:2376"]
+  }
+```
+
+#### Creating Docker Images
+
+In docker containers rely on images. An image is a combination of filesystems and parameters. Following are some command to work with images:
+
+1. List local docker images
+- `$ docker images`
+2. Create an image from a tarball
+- `$ docker import image.tar imagename:tag`
+3. Create an image from dockerfile
+- `$ docker build -t mynginximage DockerFilePath`
+4. Creates an image from a running container
+- `$ docker commit contaner_id|name new_image_name` Commits the container changed status to a new image. This is rarely used but worth knowing
+5. Create an image from stdin tarball
+- `$ docker load -i image.tar`
+6. Save an image or image to a tar file
+- `$ docker save -o my_images.tar nginx:latest alpine:3.14` The option -o means the name of the output archive
+7. Shows the history of an image
+- `$ docker history busybox-`
+8. Tag an image
+-`$ docker tag nginx:latest myregistry.example.com/mynginx:1.0` This is normmally used to tag an image with a different name to be sent to another repository, the images when pulled will have in its tag the name of the repository from which was obtained.
+
+#### Working with The Image Layers
+
