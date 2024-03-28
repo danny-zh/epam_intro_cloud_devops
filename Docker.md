@@ -189,14 +189,14 @@ The docker daemon can be run with customized configuration. Such case is useful 
 
 #### Creating Docker Images
 
-In docker containers rely on images. An image is a combination of filesystems and parameters. Following are some command to work with images:
+In docker containers rely on images. An image is a combination of filesystems and parameters. Following are some commands to work with images:
 
 1. List local docker images
 - `$ docker images`
 2. Create an image from a tarball
 - `$ docker import image.tar imagename:tag`
 3. Create an image from dockerfile
-- `$ docker build -t mynginximage DockerFilePath`
+- `$ docker build -t mynginximage:tag .` The option -t means the name and tag for the image
 4. Creates an image from a running container
 - `$ docker commit contaner_id|name new_image_name` Commits the container changed status to a new image. This is rarely used but worth knowing
 5. Create an image from stdin tarball
@@ -207,6 +207,39 @@ In docker containers rely on images. An image is a combination of filesystems an
 - `$ docker history busybox-`
 8. Tag an image
 -`$ docker tag nginx:latest myregistry.example.com/mynginx:1.0` This is normmally used to tag an image with a different name to be sent to another repository, the images when pulled will have in its tag the name of the repository from which was obtained.
+9. Add a label to a container
+- `$ docker run --label com.example.version=1.0 myimage` Labels are methadaa information that can be added to images, containers, volumes, networks, services etc that are particularly useful for documentation, resource organization and management and integration with other tools.
 
-#### Working with The Image Layers
+#### Create an image from dockerfile
+
+An image is a set of layers. Figure 2 shows the image Ansible 2.6.2 was derived from image Ansible 2.6.1 and this in turn was derived from sbelakou/centos:latest image. Each new layer just keeps the delta, not the whole layers information. Management of base images is an important thing, and there are a lot of tricks about it. Frequently, the best way is to build an image from scratch or from a simple base image.
+
+<p align="center" dir="auto">
+<img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/c8ca29e9-8549-4b1e-a9d8-c1d04ddfd84c" alt="Figure 1" width="600" height="300" style="max-width: 100%;"></a>
+  <br>
+  <em>Figure 2. Docker image layers </em>
+</p>
+
+DockerFile is an script to provide instructions for an image construction. The following is an example of a dockerfile
+
+```
+    FROM python:3.8 
+    WORKDIR /app 
+    RUN pip install flask 
+    ADD app.py /app/app.py 
+    EXPOSE 80 
+    CMD ["python","app.py"] 
+```
+From the previous example:
+
+1. **FROM** directive defines the base image and version from docker hub. Customized images from other registries can also be used.
+2. **WORKDIR** directive defines the working directory inside the container, in this case it will bee "/app". Subsequent instructions will be executed relative to this directory.
+3. **RUN** directive runs commands specially for initializing or installing needed tools, binaries, frameworks and so on.
+4. **ADD** directive copies files from localhost to working directory inside the container
+5. **EXPOSE** directive is used by convention to document the port that will be used by the container to listen for calls. This actually does not publish the port to the host machine.
+6. **CMD** directive specifies the default command to run when the Docker container starts.
+
+### 1.3 Working with Docker, Dockerfile and Running Containers
+
+ 
 
