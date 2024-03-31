@@ -348,3 +348,15 @@ When running a container from an image, different parameters can be pass into to
 - --restart: Defines the restart policy of the container. If the containers exits or fails during execution you can use restart policy for docker to launch the container again. The restart policy specifies when to restart the container and optionally the maximum number of times it will do so.
     
     - `docker run -d image --restart=always|unless-stopped|on-failure[:times]`
+
+### 1.3 Data Management in Docker
+
+Data generated inside the container is isolated from host system and cannot be accessed directly. When the containers are terminated this data is lost. To 
+
+1. Bind mounts: Provides a mapping of a file or directory between the host and the container. Processes in the host can direclty modify these files and directories, however docker cannot manage these bind mounts. There two ways to create a bind mount being the second the preferred since it's most explicit.
+    - `$ docker run -v /host_path/:/container_path my_image` The option -v maps the host_path to the container_path
+    - `$ docker run --mount type=bind,source=/home/nginxlogs,targe=/var/log/nginx my_image` The option --mount specifies the directoy nginxlogs from the host will be mapped to that of /var/log/nginx from the container
+2. Volumes: These are docker objets that can store persistent data, the volumes are attached to the containers. Docker manages the lifecycle of these volumes and are located at **/var/lib/docker/volumes**. Host processes should not modify these files direclty.
+    - `$ docker volume create my_volume` Creates a volume
+    - `$ docker run -v my_volume:/container_path my_image` The option -v attaches the docker volume to the container.
+3. Tmpfs mounts: Stores data in host RAM.
