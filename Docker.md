@@ -102,7 +102,7 @@ Regarding the storage drivers also referred to as graph drivers derived from thi
   - Does not support UnionFS or CoW
   - Not recommended for production due to poor performance
   - Valid for testing of the docker engine
-2- Overlay2:
+2. Overlay2:
   - Based on UnionFS
   - The preferred storage driver for all linux distros
 3. AUFS (Another Union File System):
@@ -196,7 +196,7 @@ In docker containers rely on images. An image is a combination of filesystems an
 2. Create an image from a tarball
 - `$ docker import image.tar imagename:tag`
 3. Create an image from dockerfile
-- `$ docker build -t mynginximage:tag .` The option -t means the name and tag for the image
+- `$ docker build -t mynginximage:tag .` The option -t means the name and tag for the image. The dot means that all content of this folder will be provided to the Docker daemon
 4. Creates an image from a running container
 - `$ docker commit contaner_id|name new_image_name` Commits the container changed status to a new image. This is rarely used but worth knowing
 5. Create an image from stdin tarball
@@ -209,6 +209,8 @@ In docker containers rely on images. An image is a combination of filesystems an
 -`$ docker tag nginx:latest myregistry.example.com/mynginx:1.0` This is normmally used to tag an image with a different name to be sent to another repository, the images when pulled will have in its tag the name of the repository from which was obtained.
 9. Add a label to a container
 - `$ docker run --label com.example.version=1.0 myimage` Labels are methadaa information that can be added to images, containers, volumes, networks, services etc that are particularly useful for documentation, resource organization and management and integration with other tools.
+10. Remove all stopped containers:
+- `$ docker container prune`
 
 #### Create an image from dockerfile
 
@@ -237,9 +239,112 @@ From the previous example:
 3. **RUN** directive runs commands specially for initializing or installing needed tools, binaries, frameworks and so on.
 4. **ADD** directive copies files from localhost to working directory inside the container
 5. **EXPOSE** directive is used by convention to document the port that will be used by the container to listen for calls. This actually does not publish the port to the host machine.
-6. **CMD** directive specifies the default command to run when the Docker container starts.
+6. **CMD** directive specifies the optional default command to run when the Docker container starts if no command is given.
 
 ### 1.3 Working with Docker, Dockerfile and Running Containers
 
  
+#### Working with docker file
 
+Dockerfiles are scripts that contains commands to create a docker image. Another common commands are:
+
+- **ENV** Sets environment variable for the container
+- **ENTRYPOINT** Default command that always will be run when the containers are started. Basically configures a container that will run as an executable.
+- **VOLUME** Creates a mount point for external mounted volumes
+- **USER** Sets which user in the container to run the commands: RUN, ENTRYPOINT, CMD
+- **ARG** Allows to define input arguments for the dockerfile when building the image
+- **LABEL** applies key/value metadata to your images, containers or daemons.
+
+**ENTRYPOINT** and **CMD** commands are special because when **ENTRYPOINT** directive is used, it will be the default command that always be executed in the container when run. This is particullarly useful when using the container for a specified purpose such as for example a web server. The entrypoint directive will call the command, script or service to execute the task. The  **CMD** in this case will provide optional default arguments for the command defined in the entrypoint, if no command is passed to the docker when run.
+
+**RUN** command will execute the given commands in a new layer on top of the current image and then commits the results. The resulting commited image will be used for the next directive in the dockerfile. 
+
+#### The .dockerignore file
+
+This file is located in the root of the directory from where the image will be builded. It helps to exclude what files and directories will be excluded from the building of the image.
+
+#### Docker base images
+
+When a docker image is created from a dockerfile, you can find the docker parent image there. A base image means a image with no parent image in the related dockerfile.
+
+A docker base image can be built from:
+
+- Scratch: Ultimate base image with 0 files and 0 size
+- Busybox: Minimal Unix weighing in at 2.5 MB and around 10.000 files
+- Alpine:latest: Alpine Linux, only 8 MB in size and has access to a package repository.
+- Debian:jessie: Latest Debian is 122 MB and around 18.000 files.
+
+An example of building an image from the scratch base image is as follows:
+
+```
+  FROM scratch 
+  
+  ADD centos.tar.gz / #This .tgz contains minimal CentOS OS
+  
+  RUN yum install -y epel-release && \
+  yum  update -d && \
+  yum clean all
+
+  LABEL architecture="amd64"\
+  OS="CentOS"
+
+  CMD ["/bin/bash"]
+```
+
+#### Building an Image with Arguments and Multistage Build
+
+
+1. Arguments: Dockerfile is considered to be static but you can add arguments which are key value pairs that act as variables, these arguments can alter the builing of the image. An example of a dockerfile using build arguments is shown below:
+
+    The dockerfile:
+    ``` 
+    ARG BASE_IMAGE
+
+    ARG user=jenkins #Assigned with default value if no one is given
+
+    FROM ${BASE_IMAGE} 
+    ```
+
+    The command to build the image needs to specify the argument, if not specified the default assigned value in the dockerfile will be used.
+
+    `$ docker build --build-arg BASE_IMAGE=ubuntu:16.04 .`
+
+2. Multistage build: Allows you to define multiple build stages within a single Dockerfile. Each build stage represents a distinct phase of the build process. This is particularly useful to separate the processes for building and running, you do not have to create two Dockerfiles. Just create one with multiple stages. Below is an example how to create multistage builds:
+
+    The dockerfile:
+    ```
+    # Stage 1: Build stage
+    FROM node:14 AS build-stage
+    WORKDIR /app
+    COPY package*.json ./
+    RUN npm install
+    COPY . .
+    RUN npm run build
+
+    # Stage 2: Production stage
+    FROM nginx:alpine AS production-stage
+    COPY --from=build-stage /app/build /usr/share/nginx/html
+    ```
+    Using multistage build can lead to more efficient and maintainable Dockerfiles, as it allows you to separate concerns and optimize each stage for its specific purpose. It also helps reduce the size of the final Docker image by discarding unnecessary build dependencies and intermediate files introduced during the build process.
+
+    The command to build the image is    
+    - `$ docker build -f dockerfile .` Builds image from all stages
+    - `$ docker build --target build-stage -f dockerfile .` Builds image only from target stage
+
+
+#### Running containers
+
+When running a container from an image, different parameters can be pass into to the docker run command
+
+- -d: Runs the container in detach mode (background) and prints the container's id
+- -P: Publish exposed ports to random host ports
+- -p: Publish exposed port to host specific ports
+- -e: Use to set env variables for the container
+- -v: Use to bind mount a volume
+- -w: Use to set working directory inside the container
+- --label: Use to add label to the container
+- --rm: use it to automatically terminate the container whe it exits
+- --entrypoint: Used to override the default entrypoint defined in the image
+- --restart: Defines the restart policy of the container. If the containers exits or fails during execution you can use restart policy for docker to launch the container again. The restart policy specifies when to restart the container and optionally the maximum number of times it will do so.
+    
+    - `docker run -d image --restart=always|unless-stopped|on-failure[:times]`
