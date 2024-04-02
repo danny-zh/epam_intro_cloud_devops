@@ -68,6 +68,12 @@ The most used isolation technologies are Namespaces, Control Groups and Chroot.
    - NET: Managing network interfaces
    - USER: User isolation
 
+    An example of a command that allows a container to be run within the same namespace of another container is the following
+    
+    - `$ docker run --network running_container image` Runs new container in the network namespace of running_container
+    - `$ docker run --pid running_container image` Runs new container in the pid namespace of running_container
+
+
 2. Control groups: Allows docker to share avaiable hardware resources to the containers and if needed set up limits and contraints.
 3. Chroot: Presents the idea that the container sees only a piece of a filesystem
 
@@ -349,7 +355,7 @@ When running a container from an image, different parameters can be pass into to
     
     - `docker run -d image --restart=always|unless-stopped|on-failure[:times]`
 
-### 1.3 Data Management in Docker
+### 1.4 Data Management in Docker
 
 Data generated inside the container is isolated from host system and cannot be accessed directly. When the containers are terminated this data is lost. To 
 
@@ -374,3 +380,44 @@ Data generated inside the container is isolated from host system and cannot be a
     - `$ docker run -d -it --name nginx --mount type=tmpfs,target=/var/log/nginx/, tmpfs-mode=1770 -p 5050:80 nginx` The key type specifies tmps to be used, also only the target is specified which is the container's directory. Also the key tmps-mode specifies the permissions in octal form for the files created in this tmps folder. 
 
     An use case for tmps can be when there is no need to store the data in a bind mount/volume or to assure the container's performance if the app needs to write large volume of non persistent data.
+  
+  ### 1.5 Docker Basics. Networking. Docker Compose
+
+  ### Networking
+
+
+  In docker there are various network drivers to work with:
+
+  1. Bridge:
+  2. Host:
+  3. Overlay:
+  4. Macvlan:
+  5. Null:
+
+  From this drivers docker provides by default three available networking objects:
+
+  1. Bridge: It isolates the networking namespace of the host and the container and provides a virtual interface for the container to use. It is the default networking mode when containers are run, this allows for containers located in the same bridge network to communicate with each other and with the host. Also it allows for automatic DNS resolution between containers just using container's name. Containers located in different bridge networks cannot communicate with each other directly.
+  2. Host: This mode shares the networking namespace of the host with the container. With this mode the docker container uses the same host network stack without any isolation. Container service can be directly accesed without using -p flag when running the container. 
+  3. None (derived from null): It isolates the networking namespace of the host and the container, it doesn't provide any virtual interface for the container. In this mode, containers have no networking connectivity. They are completely isolated from external networks. This can be useful in scenarios where you want to run a container without any network access.
+
+In docker there can be only 1 networking object created with None and Host, for bridge it can be created several networks.
+
+1. Create a network object
+  
+    `$ docker create network --driver bridge my_network` 
+
+2. List | Remove | Prune network object
+
+    `$ docker network ls|remove|prune my_network`
+
+3. Attach | detach network object to container
+
+    `$ docker network connect|disconnect my_network my_container`
+
+4. Launch container with a given network object
+
+    `$ docker run --network my_network my_image`
+
+4. Check container network configuration
+
+    `$ docker inspec my_container | jq ".[] .NetworkSettings.Networks"`
