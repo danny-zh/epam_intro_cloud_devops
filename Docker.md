@@ -388,11 +388,11 @@ Data generated inside the container is isolated from host system and cannot be a
 
   In docker there are various network drivers to work with:
 
-  1. Bridge:
-  2. Host:
-  3. Overlay:
-  4. Macvlan:
-  5. Null:
+  1. Bridge: Is a default one. When you are running a container, it executes in the default network with the bridge driver. This is how your container can reach and can be reached from your side.
+  2. Host: Means that instead of providing a virtual interface to the container, Docker will directly use a real Ethernet interface.
+  3. Overlay: connects multiple containers and enables swarm services to communicate with each other.
+  4. Macvlan: Allows managing MAC addresses inside a container, making the container appear as a physical device on your network. It is sometimes the best choice when dealing with legacy applications that are supposed to be directly connected to a physical network rather than routed through the Docker host network stack.
+  5. Null: Is meant for disabling all networking and is usually used in conjunction with a custom network driver.
 
   From this drivers docker provides by default three available networking objects:
 
@@ -400,7 +400,7 @@ Data generated inside the container is isolated from host system and cannot be a
   2. Host: This mode shares the networking namespace of the host with the container. With this mode the docker container uses the same host network stack without any isolation. Container service can be directly accesed without using -p flag when running the container. 
   3. None (derived from null): It isolates the networking namespace of the host and the container, it doesn't provide any virtual interface for the container. In this mode, containers have no networking connectivity. They are completely isolated from external networks. This can be useful in scenarios where you want to run a container without any network access.
 
-In docker there can be only 1 networking object created with None and Host, for bridge it can be created several networks.
+In docker there can be only 1 networking object created from None and Host drivers, from bridge driver it can be created several network objects
 
 1. Create a network object
   
@@ -416,8 +416,12 @@ In docker there can be only 1 networking object created with None and Host, for 
 
 4. Launch container with a given network object
 
-    `$ docker run --network my_network my_image`
+    `$ docker run --network my_network1 --network my_network2 my_image`
 
 4. Check container network configuration
 
     `$ docker inspec my_container | jq ".[] .NetworkSettings.Networks"`
+
+### Docker Compose
+
+
