@@ -260,6 +260,7 @@ Dockerfiles are scripts that contains commands to create a docker image. Another
 - **USER** Sets which user in the container to run the commands: RUN, ENTRYPOINT, CMD
 - **ARG** Allows to define input arguments for the dockerfile when building the image
 - **LABEL** applies key/value metadata to your images, containers or daemons.
+- **HEALTHCHECK** Dockers applies the defined heatcheck to verify if the container service is running.
 
 **ENTRYPOINT** and **CMD** commands are special because when **ENTRYPOINT** directive is used, it will be the default command that always be executed in the container when run. This is particullarly useful when using the container for a specified purpose such as for example a web server. The entrypoint directive will call the command, script or service to execute the task. The  **CMD** in this case will provide optional default arguments for the command defined in the entrypoint, if no command is passed to the docker when run.
 
@@ -291,6 +292,10 @@ An example of building an image from the scratch base image is as follows:
   yum  update -d && \
   yum clean all
 
+  HEALTCHECK --interval 10s \ 
+  --retries=5 --timeout=5s \
+  CMD (ping -c 1 localhost && curl -f http://localhost ) || exit 1
+  
   LABEL architecture="amd64"\
   OS="CentOS"
 
@@ -424,4 +429,155 @@ In docker there can be only 1 networking object created from None and Host drive
 
 ### Docker Compose
 
+A docker compose file allows for multi container spin up, allowing to create volumes, networks and images in a single run. All options used within docker run command can be applied in a dockercompose file. Docker Compose is a tool for defining and running multi-container Docker applications. The Compose file is a YAML file defining services, networks and volumes. Using a single command allows you to create and start all the services from your configuration.
 
+Docker compose use cases include:
+
+1. Developement environment
+2. Automated testing enviroments
+3. Single host development
+
+Docker compose privides the following features:
+
+1. Multiple isolated environments on a single host
+2. Only recreate containers that have changed
+
+A docker compose file is a YAML file that usually includes the following 6 sections:
+
+1. Splitting the app into services: For instance one service for the frontend and one service for the database, we use customized dockerfiles for each service.
+
+Example of using dockerfile named **dockerfile_mariadb** for database service
+
+  ```
+  FROM mariadb #Image from where to pull
+
+  RUN apt-get update && \
+  
+  apt-get install -y iputils-ping && \
+  apt-get install -y mysql-client && apt-get clean
+  ```
+
+2. Pulling or building images: In the dockercompose file We can build the images that we have prepared in the dockerfiles by using the directive build, also we can use the image directive to just pull the image from the registry.
+
+```
+# First we define the service, all objects or configurations to be used by the service will be child items, i.e, need to be idented
+
+database_service:
+
+  # THIS WAY reads from specified dockerfile
+  build: #
+        context: . #Where to fin the docker file
+        dockerfile: dockerfile_mariadb
+
+  # OR THIS WAY reads image from registry
+  image: mariadb #pull directly the image from the registry 
+```
+
+3. Configuring environment variables: We can use the directive environment or we can read variables from file
+
+```
+database_service:
+  build: 
+    context: .
+    dockerfile: dockerfile_mariadb
+
+  # THIS WAY reads env vars from file
+  env_file: 
+    - mariadb_env1 # The dash (-) means a item of a list
+    - mariadb_env2
+
+  # OR THIS WAY reads key value pairs
+  environment: 
+    - VAR1:value1
+    - VAR2:value2
+```
+
+4. Configuring networking and ports: We can attach network objets the a given service and configure on which port they will liste
+
+```
+database_service:
+  build: 
+    context: .
+    dockerfile: dockerfile_mariadb
+
+  env_file: 
+    - mariadb_env1
+
+  networks:
+    - dockercompose-frontend #Specifies the name of the network object
+
+  ports:
+    - "3306:3306" Listens on any host interface
+    - "0.0.0.0:3306:3306" Listens on any host interface
+    - "192.168.0.7:3306:3306" Listens on specifi host interface
+   
+# Objects need to be created outside all services definition
+networks:
+  dockercompose-frontend:
+
+```
+
+5. Setting up volumes: We can attach volume objects either bind or volume mounts to containers
+```
+database_service:
+  build: 
+    context: .
+    dockerfile: dockerfile_mariadb
+
+  env_file: 
+    - mariadb_env1
+
+  networks:
+    - dockercompose-frontend #Specifies the name of the network object
+
+  ports:
+    - "3306:3306"
+
+  volumes:
+      - mysql:/var/lib/mysql # A volume mount
+      - /opt/docker/dockercompose/task-13/:/backup # A bind mount
+
+networks:
+  dockercompose-frontend:
+
+# Volume mounts also needs to be created outside all services definition
+# Bind mounts are not needed to be created outside service definition
+
+volumes:
+  mysql:
+
+```
+
+6. Build and run: After docker compose is complete, it can be run by using command
+
+- `$ docker compose up -d` Option -d means to run in detach mode
+
+- `$ docker compose up -d --build ` Use to build or rebuild if dockerfile cofiguration or docker compose configuration file is changed.
+
+
+```
+database_service:
+  build: 
+    context: .
+    dockerfile: dockerfile_mariadb
+
+  env_file: 
+    - mariadb_env1
+
+  networks:
+    - dockercompose-frontend #Specifies the name of the network object
+
+  ports:
+    - "3306:3306"
+
+  volumes:
+      - mysql:/var/lib/mysql
+      - /opt/docker/dockercompose/task-13/:/backup 
+
+networks:
+  dockercompose-frontend:
+
+volumes:
+  mysql:
+````
+7. Other configurations: healtchecks, commands, entry points, so on
