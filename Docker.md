@@ -612,3 +612,87 @@ volumes:
 
 ### 1.7 Docker Basics. Linux Kernel Namespaces and Control Groups
 
+
+#### Docker Namespaces, Cgroups
+
+1. Namespaces: Controls what the container can see. They provide a laver of isolation or limit around each container. Some namespace are:
+    - PID: Isolates process ID number space. Containers will see only the process they are running inside
+    - NET: Allows containers to have their own network stack (interfaces, IP addresses, firewall rules, etc)
+    - MNT: Provides isolation at the filesystem level. Processes running inside it only see container mount points
+    - UTS (Unix Time Sharing): Isolates the hostname and domain name of the container. This allows each container to have its own hostname and domain name, separate from the host system and other containers.
+    - IPC: Isolates inter-process communication resources such as System V IPC objects and POSIX message queues. This ensures that processes inside the container cannot access IPC resources of processes outside the container.
+
+    The limits of what the container can see can be extended by options passed to **docker run** command, for example we can run a contaner in the same namespace as other container or the host machine
+
+    - `$ sleep 1000 && docker run --pid=host bash -c "my_image pkill -9 sleep"` With the PID option the container will be in the same target pid namespace, in this case the host. Container will later able to use view, modify and terminate host processes directly
+
+2. Control Groups (Cgroups) Controls how much resources the container can use like amount of RAM, CPU network bandwitdh, I/O devices. Some Cgroups are:
+
+    - Memory cgroup: Controls RAM resources for containers
+    - CPU group: Control CPU time and usage
+    - CPUSet cgroup: Used to bind a group to a specific CPU
+    - Devices cgroup: Used to read/write access devices
+
+    Some examples of RAM limit and CPU limits are as shown below:
+
+    - `$ docker run --memory 100m myimage` Limits maximum amount of RAM container can use
+    - `$ docker run --memory 100m --memory-reservation 100m myimage` Limits maximum amount of RAM container can use and reserves 100M extra memory for fast access if needed.
+    - `$ docker run --cpu-quota=25000 --cpu-period=100000 mycontainer` It means during the cpu period how much time in microseconds the container will use, in this case is 25%. The default value for cpu-period is 100000 microseconds
+    - `$ docker stats mycontainer` Will display usage stats about an specific running container
+
+
+#### Docker in Docker (Dind)
+
+It means a container that runs docker daemon inside. This approach is recommended when using CI/CD tools like jenkins. Basically, in Jenkins, all the commands in your pipeline stages are executed on the agent you specify. You can specify a Docker container as an agent. If one of your commands, for example, in the Build stage, is a Docker command for building an image, then you need to run a Docker command within a Docker container.
+
+
+To start a dind container you can specify the following
+
+- `$ docker run --privileged -v /usr/var/bin -v /var/run --name dind -d docker:dind` Need to share the host binaries for running dind, this binaries are located in the specified locations
+- `$ docker exec dind docker run -d --name nginx nginx` Start nginx inside the dind
+- `$ docker run --volumes-from=dind sbeliakou/centos ps` Starts another container using the same binaries from dind which in fact are from the host.
+
+
+<p align="center" dir="auto">
+<img src="https://elearn.epam.com/assets/courseware/v1/aa4c1743cd0dced76e60081cde50d573/asset-v1:RD_CIS+DOBCDocker+1222+type@asset+block/SM7_L6_pic6_Example_2.svg
+" alt="Figure31" width="600" height="300" style="max-width: 100%;"></a>
+  <br>
+  <em>Figure 3. Dind example </em>
+</p>
+
+
+#### Accessing Docker via Remote API
+
+When access to the docker daemon that is running in a remote host is needed, it is necessary to configure the daemon to listen on TCP socket for API calls. By default, dockerd only listens for API calls in the local unix socket. To enable TCP socket for docker we can configure the unit file of the **docker.service** or we can edit the **/etc/docker/daemon.json** file.
+
+Both files shouldn't be edited otherwise daemon will fail to start. Editing the daemon.json file is preferred for centralized configuration of dockerd.
+
+- `$ systemctl edit docker.service` Edits the current configuration of the unit file of the docker service. The -H option specifies the local interface and port where to listen for calls
+    ```
+    [Service]
+    ExecStart=
+    ExecStart=/usr/bin/dockerd -H fd:// -H tcp://192.168.0.27:2375
+    ```
+- `$ sudo vi /etc/docker/daemon.json` Edits the configuration file for extra parameters for the dockerd to run
+  ```
+  {
+    "hosts": [
+      "unix:///var/run/docker.sock",
+      "tcp://192.168.0.27:2375"]
+  }
+  ```
+
+- `$ systemctl daemon-reload && systemctl restart docker.service && curl 192.168.0.27:2375/_ping` Apply changes and check if docker TCP socket is working
+
+
+Once the dockerd is listening on a TCP socket, the client (must have docker-cli installed) can connect to it in two ways:
+
+1. Issue each docker command specifying the remote host
+    - `$ docker -H 192.168.0.27:2375 ps`
+
+2. Creating a customed context in the client (Preferred)
+    - `$ docker context create --docker host=ssh://docker-user@192.168.0.27 --description="Remote engine" my_context` Creates custom context, the contexts are store in **~/.docker/contexts**
+    - `$ docker context use my_context` Changes docker client to use the specified context, subsequent docker commands are executed againts the defined context
+3. Updating DOCKER_HOST environment variable to specify over which host to execute commands
+
+    - `$ DOCKER_HOST=192.168.0.27:2375`  
