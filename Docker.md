@@ -691,8 +691,49 @@ Once the dockerd is listening on a TCP socket, the client (must have docker-cli 
     - `$ docker -H 192.168.0.27:2375 ps`
 
 2. Creating a customed context in the client (Preferred)
-    - `$ docker context create --docker host=ssh://docker-user@192.168.0.27 --description="Remote engine" my_context` Creates custom context, the contexts are store in **~/.docker/contexts**
+    - `$ docker context create --docker host=ssh://docker-user@192.168.0.27 --description="Remote engine" my_context` Creates custom context, the contexts are store in **~/.docker/contexts**. Server where dockerd is running, also needs to run SSH for the secure context to work.
     - `$ docker context use my_context` Changes docker client to use the specified context, subsequent docker commands are executed againts the defined context
 3. Updating DOCKER_HOST environment variable to specify over which host to execute commands
 
-    - `$ DOCKER_HOST=192.168.0.27:2375`  
+    - `$ DOCKER_HOST=tcp://
+    192.168.0.27:2375`  
+
+#### Monitorng Containers
+
+When running docker, it is important to measure the metrics about the system and containers. Some of the parameters to look for are:
+- Image | container | volume count
+- Image | container | volume size
+- CPU | Memory usage
+- Network bandwidth
+- Disk throughput
+- Process count
+
+In order to monitor the dockerd and the containers it is running, there are two popular options:
+
+1. cAdvisor: Can be launched from the following docker compose file
+    ```
+    services:
+      web_advisor:
+        image: gcr.io/cadvisor/cadvisor
+        #image: google/cadvisor:latest
+        restart: on-failure
+        ports:
+          - "80:8080"
+        volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:rw
+          - /sys:/sys:ro
+          - /var/lib/docker/:/var/lib/docker:ro
+          - /dev/disk/:/dev/disk:ro
+    ```
+
+2. Prometheus: Prometheus can monitor containers through cAdvisor, taking data from the Docker daemon and can connect to cloud resources.
+
+Some commands to check monitor docker containers:
+
+1. `$ docker system info`
+2. `$ docker system df` Displays disk usage of docker images, containers, volumes
+3. `$ docker ps -s` Shows running containers total size
+4. `$ docker images -f dangling=true` Shows unused images
+5. `$ docker images -f dangling=true` Shows unused volumes
+6. `$ docker system prune` Removes all system unused volumes, networks, containers, build cache
