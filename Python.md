@@ -106,6 +106,17 @@ Inmnutable unordered collection of unique items. Sets are not subscriptable. Bas
 
 ## 3. Classes, Modules, Packaging
 
-### 3.1 Classes
+### 3.1 Scopes
 
+Defines the scope of a variable in Python, usually whether the variable is global or local. Python uses the LEGB (Local, Enclosing, Global, Built-in) rule for variable name resolution.
 
+- Local: Variables defined inside a function
+- Enclosing: Variables defined inside a closure function and used by the inner function
+- Global: Variables defined in the python script not nested inside any function. object, etc.
+- Built-in: Variables that come as Python's built-in.
+
+Some rules for working with global and local variables:
+- All variables declared inside functions are local variables
+- Local variables cannot be accesed from outside of the context from which were created
+- Functions can read and use global variables but the content of the variable outside that function remains unchanged. Except for mutable data structures which their values can be changed directly if modified inside the function.
+- If it is need that the function modifies the variable from the global scope, we need to declare the variable as **global** inside the function.
