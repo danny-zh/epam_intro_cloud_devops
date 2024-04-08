@@ -56,15 +56,56 @@ An example when using pyenv in shown in figure 1
 
 List are mutable ordered data structures
 
-- Pop: Deletes the last or the specified index of the array. Raises an error it list is empty
+- Pop: Deletes the last or the specified index of the list. Raises an error if list is empty
   - `["a","b","c","d"].pop()` # Pops last list's item
   - `["a","b","c","d"].pop(2)` # Pops item at index 2
 
-- Remove: Delete the given object of the list if present. Raise an error is object is not found.
+- Remove: Delete the given object of the list if present. Raises an error is object is not found.
    - `["a","b","c","d"].remove("c")` # Removes the object "c"
 
 ### 2.4 Tuples
 
-Tuples are inmutalbe ordered data structures
+Tuples are inmutable ordered data structures. Tuples are like lists but it cannot be updated at a particular index or subsequence of the tuple
 
 ### 2.5 Dictionaries
+
+Mutable object. Python's object that consists of key-value pairs. It is python's implementation of what is know as an associative array. Dictionaries only allow hashable items as keys.
+
+- Set default: Sets the default value of a given key 
+  ```
+  d = {}
+  d.setdefault("node", []).append("item")
+  ```
+
+- Pop: Pops the specified key and print the return value r_value
+
+  - `d.pop(key, r_value)`
+
+- Popitem: Pops the last item of the dict in a LIFO way
+- Update: Updates d1 with the items from d2. Existing items get replaced, new items are added
+  ```
+  d1={1:"one", 2:"five"}
+  d2={2:"two", 3:"three"}
+  d1.update(d2)
+  ```
+### 2.6 Sets
+
+Inmnutable unordered collection of unique items. Sets are not subscriptable. Basic uses include membership testing and eliminating duplicate entries. Set objects also support mathematical operations like union, intersection, difference, and symmetric difference.
+
+- Pop: Pops the items in a FIFO way.
+- Discard and Remove: Removes item of the set. Removes rises and error if the item does no exitst in the set, dicard does not.
+- Operation between sets: 
+  ```
+  set1  = {1,2,3,4}
+  set2 = {3,4,5,6}
+  set1 & set2 # Intersection {3, 4}
+  set1 | set2 # Union {1, 2, 3, 4, 5, 6}
+  set1 - set2 # Difference {1, 2}
+  set1 ^ set2 # Simetric Difference {1, 2, 5, 6}
+  ```
+
+## 3. Classes, Modules, Packaging
+
+### 3.1 Classes
+
+
