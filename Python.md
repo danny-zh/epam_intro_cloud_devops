@@ -120,3 +120,332 @@ Some rules for working with global and local variables:
 - Local variables cannot be accesed from outside of the context from which were created
 - Functions can read and use global variables but the content of the variable outside that function remains unchanged. Except for mutable data structures which their values can be changed directly if modified inside the function.
 - If it is need that the function modifies the variable from the global scope, we need to declare the variable as **global** inside the function.
+
+### 3.2 Lambda
+
+Lambda functions are anonymous functions, lambda can receive several arguments but only can eval one expression. Lamdba functions are useful when you want to perform regular tasks and don´t want to define a separate function with the def keyword.
+
+- Syntax: Lambda gets arguments and expression in the form args:expression. Arguments can be set to have default values
+  - `lambda x, y, z=1 : x + y + z`
+
+It can be used with other functions such as map and filter
+
+  - `map(lambda x, y, z=1 : x + y + z, [x_iterable],[y_iterable],[z_iterable])`
+  - `filter(lambda x, y, z=1 : x + y + z > 8, [x_iterable],[y_iterable],[z_iterable])`
+
+### 3.3 Class
+
+It allows to encapsulate data and methods into a single data structure. The class is most of like blueprint that is used to create objects.
+
+An example of classes implementing class variables (both puclib and private*), class methods, and inheritance is given below
+```
+def class_function (self):
+        print("I am a class fuction")
+
+class TestClassParent:
+    class_variable_parent = 4
+    __hidden_class_variable_parent = 10
+    def __init__(self, *args, **kwargs):
+      pass
+
+
+class TestClass(TestClassParent):
+    class_variable = 0
+    __hidden_class_variable = 2
+    f = class_function
+    def __init__(self):
+      super().__init__()
+      TestClassParent.__init__(self)
+
+
+class_object = TestClass()
+
+print(class_object.class_variable) # 0
+class_object.f() # I am a class fuction
+print(class_object._TestClass__hidden_class_variable) # 2
+print(class_object.class_variable_parent) #4
+print(class_object._TestClassParent__hidden_class_variable_parent) #10
+```
+
+Python classes can implement something referred to as dunder or magic methods. These methods start and end with __ (double underscore). They are use to define the behaviour of the object when in presence of certain operations or function calls.For example:
+ 
+- object2 + object2, the method **\__add__()** from the object is called. 
+- print(object),  the **\__str__()** method from the object is called
+- len(object),  the **\__len__()** from the object is called
+- object[x], the **\__getitem__()** from the object is called
+- object[x] = 10, the **\__setitem__()** from the object is called
+
+An example of using magic methods is shown belos
+
+```
+class Vector:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def __str__(self):
+        return f'Vector ({self.a}, {self.b})'
+
+    def __add__(self,other):
+        return Vector(self.a + other.a, self.b + other.b)
+
+v1 = Vector(2,10)
+v2 = Vector(5,-2)
+print(v1 + v2) # print calls __str__ method implicitly to convert Vector object to string
+
+------
+Output:
+Vector (7, 8)
+```
+
+### 3.4 Modules
+
+These are python script files that contain definitions of variables, functions, classes and other Python objects that are bundled together and can be imported or use by other scripts. 
+
+```
+import module as
+import module as customed_module
+from module import variable, function
+from module import variable as v, function as f
+```
+
+The search order when importing a module into a script is a follows:
+
+1. Search locally where the script was runned, or if python interpreter is launch in the interactive mode, search in the current directory
+2. Search in the list of directories contained in the PYTHONPATH environment variable, if it is set. 
+3. Default path at /usr/lib/python/sys.path
+
+When importing a module, its contents can be scanned with the dir function
+```
+import sys
+dir(sys)
+```
+
+### 3.5 Files
+
+Both plain and binary files can be opened, modified and saved with the open() function
+
+There are two ways to work with a file:
+
+1. Using open and close functions
+
+```
+file = open(file_path, mode, encoding)
+file.read() # Loads the whole file into RAM
+file.close() # Closes the file descriptor used to open the file
+```
+
+2. Using with keyword. This is the preferred way since it can close automatically the file descriptor associated with the file, once it gets done using
+
+```
+with open(file_path, mode, encoding) as file:
+  file.read()
+```
+
+### 3.6 Packages
+
+When the number of modules increases it becomes hard to manage them separaterly. Packages bundles together a collection of modules. It helps to provide a hierchical structure to access the modules, also it helps to separate the namespace of the the variables, functions, classes, etc defined in each module so they don't overlap with each other.
+
+```
+Below the example of a package structure.
+└── animals
+    ├──handlers
+    │  ├── __init__.py
+    │  ├── walk.py
+    │  └── swim.py
+    ├── __init__.py
+    ├── crocodile.py
+    └── monkey.py
+```
+
+In order for python to use a package we need to include the **\__init__.py** file somewhere in the package structure. This file is executed as part of the initialization process for the package. It can contain Python code that initializes package-level attributes, imports submodules, or performs any other setup tasks necessary for the package.
+
+
+To import modules or its objects from packages we use the following dot notation
+```
+from animals import crocodile
+from animals.monkey import Monkey
+from animals.handlers import swim
+from animals.handlers.walk import is_walking
+```
+
+### 3.6 Packaging
+
+Python uses the **Disutils** module which is a standard python library that provides a framework for python package building and distribution. **Setuptools** module is another popular option that is built on top of Disutils and offers more avanced features and improvements for package building and distribution.
+
+How it works?
+
+1. Have ready the package you want to builld 
+
+    ```
+    zoo-example
+    ├── animals
+    │   ├──handlers
+    │   │  ├── __init__.py
+    │   │  ├── walk.py
+    │   │  └── swim.py
+    │   ├── __init__.py
+    │   ├── crocodile.py
+    │   ├── monkey.py
+    │   └── zoo.py
+    ├── README.md
+    ```
+
+2. Install the tools for package building
+
+- `pip install build wheel twine`
+
+3. Include the setup.py file in the root directory of the package. This file contains package metadata that the building tool will use to configure and build the package
+
+    ```
+    from setuptools import setup, find_packages
+
+    setup(
+        name="zoo-example",
+        packages=find_packages(),
+        entry_points={
+            "console_scripts": [
+                "zoo = animals.zoo:main",
+            ],
+        },
+        install_requires=[
+           "termcolor==1.1.0",
+        ],
+        version="0.1",
+        author="Captain Jack",
+        author_email="captain_jack@gmail.com",
+        description="Example of the test application",
+        license="MIT",
+    )
+    ```
+
+- The entry_points are a type of metadata that can be exposed by packages on installation. They come especially handy when the package would like to provide commands to be run at the terminal.
+- Install_requires is the metadata that installs dependencies for the package.
+
+4. Build the package
+
+There are different build formats: sdist, bdist_wheel and bdist_egg. Sdist format builds the package including the python source code.
+
+- `$ python setup.py bdist_egg`
+- `$ python setup.py bdist_wheel`
+- `$ python setup.py bdist_wheel --universal`
+- `$ python setup.py sdist`
+
+
+5. Upload to PyPI
+
+Need to have account in PyPI
+
+- `$ twine upload /home/user/zoo-example/dist/*`
+
+6. Install/Unistall the package
+
+- If the  package was uploaded to PyPI
+
+  `$ pip install -U package_name` Upgrades the packet if already exists
+
+- If package was downloaded as a file
+
+  `$ pip install /home/user/package_name`
+
+-  Unistall package
+
+    `$ pip uninstall package_name`
+
+
+## 4. Debugging, Jinja2 templates, Flask
+
+### 4.1 Exceptions
+
+Exceptions are errors that occur during the program execution. When an exeption is raised, the program execution in terminated. There are several types of built-in exceptions provide by Python as show in figure 2.
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/828eb4c0-03bb-4c62-bb83-28e500097d5b"
+         alt="Figure 2" width="600" height="300"/>
+  <br/>
+  <em>Figure 2. Exception Tree</em>
+</p>
+
+Exeception handling is the costruct that allows to manage encountered exceptions. When a exception is meet, the program save the execution state, then runs the function or code for exception handling and finally resumes the program execution, in this way the exception is handled.
+
+```
+try:
+   # You do your operations here;
+   ......................
+except (Exception1, [Exception2[,... Exception]]):
+   # If there is Exception1, then execute this block.
+   ......................
+else:
+   # If there is no exception then execute this block. 
+finally:
+   # This would always be executed.
+```
+### 4.2 Debugging in Python
+
+### 4.1 Logging
+
+When logging useful data from the right places, you can not only debug errors easily but also use the data to analyze the performance of the application to plan for scaling or look at usage patterns to plan for marketing. Some logging tools are:
+
+1. Print
+    ```
+    print("This is a log message")
+    ```
+2. Syslog
+    ```
+    from syslog import syslog
+    syslog('This is a debug message.')
+    ```
+    To see the logs we can do:
+
+    `$ tail /var/log/syslog`
+
+3. Logging: Ready to use and powerful module used by most third-party Python libraries
+    ```
+    import logging
+
+    logging.basicConfig(filename='app.log', filemode='w',
+                    format='%(name)s - %(levelname)s - %(message)s')
+
+    logging.debug('This is a debug message')
+    logging.info('This is an info message')
+    logging.warning('This is a warning message')
+    logging.error('This is an error message')
+    logging.critical('This is a critical message')
+    ```
+    
+    Complex logging configurations are achieve by providing a configuration file, normally in YAML format.
+
+    ```
+    import logging
+    import logging.config
+    import yaml
+
+    with open('config.yaml', 'r') as f:
+      config = yaml.safe_load(f.read())
+      logging.config.dictConfig(config)
+
+    logger = logging.getLogger("simpleExample")
+
+    logger.debug('This is a debug message')
+    ```
+
+### 4.2 Debugging
+
+Some debuggers for python are:
+
+1. python -m pdb: Built-in debugger for python
+
+    `$ python -m pdb myscript.py`
+2. pdb.set_trace(): 
+
+    ```
+    import pdb
+    a = "aaa"
+    pdb.set_trace() #When the program reaches this point, it will enter the pdb mode for debugging
+    b = "bbb"
+    c = "ccc"
+    final = a + b + c
+    print(final)
+    ```
+
+### 4.2 Jinja2 Templates
