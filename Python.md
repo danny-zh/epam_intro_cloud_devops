@@ -433,7 +433,7 @@ When logging useful data from the right places, you can not only debug errors ea
 
 Some debuggers for python are:
 
-1. python -m pdb: Built-in debugger for python
+1. python -m pdb: Interactive CLI Built-in debugger for python, useful when no GUI is avaiable such as in a docker container
 
     `$ python -m pdb myscript.py`
 2. pdb.set_trace(): 
@@ -449,3 +449,53 @@ Some debuggers for python are:
     ```
 
 ### 4.2 Jinja2 Templates
+
+Jinja is a templating engine for Python. It is used to generate dynamic content, such as HTML pages or emails, by blending static template files with dynamic data. For it to uses the packages needed are Jinja2 and pyyaml
+
+Sintax:
+
+- {{ }} : Used to replace tags
+- {{% %}} : Used for control statements such as if, for, while, etc.
+- {{# #}} : Used for comments
+
+```
+import yaml
+from jinja2 import Template
+
+# Load data
+with open('data.yml') as data_file:
+    config_data = yaml.load(data_file, Loader=yaml.FullLoader)
+
+# Load template
+with open('vhosts.j2') as template_file: 
+    template_html = template_file.read()
+
+# Render template
+template = Template(template_html) 
+vhosts_conf = template.render(config_data)
+
+with open('vhosts.conf', 'w') as vhosts_file:
+    vhosts_file.write(vhosts_conf)
+```
+
+### 4.3 Python App Architecture
+
+Python is widely used for web developement, specially in the backend. The architecture of a python-based web application is show in figure 3. 
+
+<p align="center">
+  <img src="https://github.com/userforpyhon47/epam_intro_cloud_devops/assets/134888524/4901c2cf-e412-43d9-92fa-6ff91e213144"
+         alt="Figure 3" width="600" height="300"/>
+  <br/>
+  <em>Figure 3. Python Web App Architecture</em>
+</p>
+
+1. Web Server: It provides static content resources to the clients such as html, css, json, xml and others. Popular options for web servers are:
+    - Apache
+    - Nginx
+2. WSGI: Web Server Gateway Inferface decouples web server and python-based application framework. It provides a standard interface for web server to communicate with application running python code. Popular options for WGSI are:
+    - Gunicorn
+    - uWGSI
+3. Application Framework: A framework implements common issues for a web application (such as template system, ORM (Object Relational Mapping) systems, user authentication, content administration, site map. Popular options are:
+    - Django
+    - Flask
+    - FastAPI 
