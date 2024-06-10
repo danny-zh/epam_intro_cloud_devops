@@ -8,4 +8,6 @@ There are 5 sections as shown below:
 ### 2. [Bash Bootcamp](Bash.md) 
 ### 3. [Docker Bootcamp](Docker.md) 
 ### 4. [Python Bootcamp](Python.md) 
+### 5. [CI-CD Bootcamp](CI-CD.md) 
+
 
