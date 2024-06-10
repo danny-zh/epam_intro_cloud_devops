@@ -1,6 +1,6 @@
 # CI/DC Bootcamp
 
-### 1. [CI With Jenkins](#1.-CI-With-Jenkins)
+### 1. [CI With Jenkins](#1.-ci-with-jenkins)
 ### 1.1 [Why need CI & CD?](#1.1-Why-need-CI&CD?)
 ### 1.2 [CI&CD Concept](#1.1-Why-need-CI&CD?)
 ### 1.3 [Why Jenkins?](#1.3-Why-Jenkis?)
