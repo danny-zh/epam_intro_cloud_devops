@@ -3,8 +3,8 @@
 ### 1. [CI With Jenkins](#1.-CI-With-Jenkins)
 ### 1.1 [Why need CI & CD?](#1.1-Why-need-CI&CD?)
 ### 1.2 [CI&CD Concept](#1.1-Why-need-CI&CD?)
-  
-### 2. [Practice](#1.-Practice)
+### 1.3 [Why Jenkins?](#1.3-Why-Jenkis?)
+### 2. [Practice](#2.-Practice)
 
 ## 1. CI With Jenkins
 ### 1.1 Why need CI&CD?
@@ -43,6 +43,28 @@ Overall the benefits of CI are:
 - Test pipeline customization: Builds can be chained
 - Built-in parallel execution: Distribute building jobs to underlying hosts.
 
+### 1.3 why Jenkins?
+It is by far the most popular and used CI&CD tool.
+
+- Free and open source
+- Supported in various platforms (windows, linux, docker, cloud)
+- Big support community
+- Plugins for extended functionality
+
+
+<p align="center">
+  <img src="https://github.com/danny-zh/epam_intro_cloud_devops/assets/134888524/c996c1b3-463b-4909-977a-b965413eaf1d"
+         alt="Figure 1" width="600" height="300"/>
+  <br/>
+  <em>Figure 2. CI&CD Tools</em>
+</p>
+
+### 1.3 Install Jenkins
+
+Must:
+- JDK with compatible version must be installed (JKD 7, 10 , 21)
+- In windows to start or stop the process you must do **win+r**, then type **services.msc** and look for jenkis service
+- Follow installation guide from https://www.jenkins.io
 
 ## 2. Practice
 
