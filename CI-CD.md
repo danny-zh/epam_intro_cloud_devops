@@ -20,7 +20,7 @@ CI rebuilds the whole application on every change introduced. This is particular
 
 <p align="center">
   <img src="https://github.com/danny-zh/epam_intro_cloud_devops/assets/134888524/1d918fdf-4d0b-4e4f-87bd-83825254265b"
-         alt="Figure 1" width="600" height="300"/>
+         width="600" height="300"/>
   <br/>
   <em>Figure 1. CI&CD Workflow</em>
 </p>
@@ -54,7 +54,7 @@ It is by far the most popular and used CI&CD tool.
 
 <p align="center">
   <img src="https://github.com/danny-zh/epam_intro_cloud_devops/assets/134888524/c996c1b3-463b-4909-977a-b965413eaf1d"
-         alt="Figure 1" width="600" height="300"/>
+          width="600" height="300"/>
   <br/>
   <em>Figure 2. CI&CD Tools</em>
 </p>
@@ -65,6 +65,28 @@ Must:
 - JDK with compatible version must be installed (JKD 7, 10 , 21)
 - In windows to start or stop the process you must do **win+r**, then type **services.msc** and look for jenkis service
 - Follow installation guide from https://www.jenkins.io
+
+### 1.4 Build Triggers
+
+Build triggers allows to automatically start a build job when a condition or criteria is met. Most common build triggers are:
+
+1. On-demand run: Manual
+2. Other job finish: Start when anoter job finishes successfully
+3. Cron schedule: Set an calendar based schedule
+4. SCM check: Source code management, for tracking commits in CVS. It works based a cron expression. For load balance the variable **H** is preferred to be used to avoid several jobs looking for changes in the CVS at the same time.
+
+### 1.5 Cron Syntax
+
+Cron is a built-in utility in jenkins that allows execution of jobs given a certain schedule. Figure 3 shows the sintax of cron
+
+[Crontab](https://crontab.guru/) is an excellent web based app to check for the cron expression for a particular need.
+
+<p align="center">
+  <img src="https://github.com/danny-zh/epam_intro_cloud_devops/assets/134888524/00e37395-09f7-4c74-bfc4-ec351157fc05"
+          width="600" height="300"/>
+  <br/>
+  <em>Figure 3. Cron Syntax</em>
+</p>
 
 ## 2. Practice
 
