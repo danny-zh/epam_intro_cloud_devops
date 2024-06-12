@@ -88,5 +88,16 @@ Cron is a built-in utility in jenkins that allows execution of jobs given a cert
   <em>Figure 3. Cron Syntax</em>
 </p>
 
+### 1.6 Jenkins Security
+
+Sometimes, the administrator password is forgotten. To re-gain access to the Jenkins server, need to edit the config.xml file to remove authentication of users, this allows to access the server and later change the password
+
+1. Go to $JENKIS_HOME and update the file config.xml
+2. Edit the tag <useSecurity>false</useSecurity> from true to false
+3. Delete the contents of the tags <authorizationStrategy> and <securityRealm>
+4. Restart Jenkins service
+
+
+
 ## 2. Practice
 
